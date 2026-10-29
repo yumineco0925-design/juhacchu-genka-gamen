@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>項目の定義</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="page">
+<header>
+<p class="disc">架空の会社の資料です（自主制作）</p>
+<nav class="nav" aria-label="文書の移動">
+<a href="../index.html">目次へ</a>
+<a class="prev" href="04_gamen_ichiran.html">前の文書<span class="doc">（画面の一覧と遷移）</span></a>
+<a href="06_gamen_ito.html">次の文書<span class="doc">（画面ごとの意図）</span></a>
+</nav>
+</header>
+
+<main>
+<h1>項目の定義</h1>
+<p>会社名の<span id="company">青嶺設備工業株式会社</span>（架空）、工事名、取引先名は全て架空です。</p>
+
+<nav class="toc" aria-label="この文書の目次">
+<ol id="toc"></ol>
+</nav>
+
+<div id="tables"></div>
+</main>
+
+<footer class="disc">
+<p>公開されている情報と一般的な商慣行をもとにした自主制作です。</p>
+<p>実在する企業の業務、データ、資料は使っていません。</p>
+<p>確認が要る事柄は、決めつけずに分けてあります。</p>
+</footer>
+</div>
+
+<script src="../assets/data.js"></script>
+<script>
+(function () {
+  var S = window.SAMPLE;
+  var box = document.getElementById('tables');
+  var toc = document.getElementById('toc');
+
+  function el(tag, attrs, text) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  if (!S || !S.schema) {
+    box.appendChild(el('p', null, '項目の定義を読み込めませんでした。'));
+    return;
+  }
+  if (S.settings && S.settings.company) {
+    document.getElementById('company').textContent = S.settings.company;
+  }
+
+  // 列は項目の属性の順。全ての項目で空の属性は列にしない。キーは項目名の下に出す
+  var COLS = [
+    ['name', '項目（キー）'], ['type', '型'], ['required', '必須'],
+    ['edit', '編集'], ['default', '初期値'], ['content', '内容']
+  ];
+
+  // 短い値は途中で折り返さない（字数の上限）
+  var NOWRAP = { name: 9, required: 7, edit: 7, 'default': 7 };
+  var NBSP = String.fromCharCode(160);
+  var WJ = String.fromCharCode(0x2060);
+
+  function keysOf(f) {
+    return f.keys ? f.keys : (f.key ? [f.key] : []);
+  }
+
+  // 1字だけが次の行に落ちないよう、○とその直前の字、末尾の2字を U+2060 でつなぐ。英数字の番号はハイフンの後で折り返さない
+  function tie(v) {
+    return v.replace(/([A-Za-z0-9])-(?=[A-Za-z0-9])/g, '$1-' + WJ)
+      .replace(/(.)○/g, '$1' + WJ + '○')
+      .replace(/([^\u2060\s])([^\u2060\s])$/, '$1' + WJ + '$2');
+  }
+
+  function hasValue(fields, attr) {
+    return fields.some(function (f) { return !!f[attr]; });
+  }
+
+  // どの列も語の途中で折り返さず、列を文節より細くしない
+  function cell(f, attr, label) {
+    var td = el('td', { 'data-label': label, 'class': 'ph' });
+    var v = f[attr] || '';
+    if (attr === 'name') {
+      // ／で並べた項目名は／の後で折り返せるようにする
+      v.split('／').forEach(function (part, i, parts) {
+        if (i) td.appendChild(el('wbr'));
+        if (i < parts.length - 1) part += '／';
+        td.appendChild(el('span', part.length <= NOWRAP.name ? { 'class': 'nw' } : null, tie(part)));
+      });
+      keysOf(f).forEach(function (k) {
+        td.appendChild(el('br'));
+        td.appendChild(el('code', { 'class': 'nw muted' }, k));
+      });
+      return td;
+    }
+    if (v && v.length <= (NOWRAP[attr] || 0)) td.className = 'ph nw';
+    // 空の値は幅375の縦並びで行の高さを保つため空白1字にする
+    td.textContent = v ? tie(v) : NBSP;
+    return td;
+  }
+
+  Object.keys(S.schema).forEach(function (id) {
+    var t = S.schema[id];
+    var fields = t.fields || [];
+    var title = t.name + '（' + fields.length + '項目）';
+
+    var li = el('li');
+    li.appendChild(el('a', { href: '#' + id }, title));
+    toc.appendChild(li);
+
+    box.appendChild(el('h2', { id: id }, title));
+
+    var cols = COLS.filter(function (c) { return hasValue(fields, c[0]); });
+    var table = el('table', { 'class': 'tbl stack', 'aria-labelledby': id });
+    var hr = el('tr');
+    cols.forEach(function (c) {
+      var th = el('th', { scope: 'col' }, c[1]);
+      if (c[0] === 'name') th.className = 'w10';
+      hr.appendChild(th);
+    });
+    table.appendChild(el('thead')).appendChild(hr);
+    var tb = el('tbody');
+    fields.forEach(function (f) {
+      var tr = el('tr');
+      cols.forEach(function (c) { tr.appendChild(cell(f, c[0], c[1])); });
+      tb.appendChild(tr);
+    });
+    table.appendChild(tb);
+    box.appendChild(table);
+
+    (t.notes || []).forEach(function (s) { box.appendChild(el('p', null, s)); });
+
+    if (t.computed && t.computed.length) {
+      box.appendChild(el('h3', null, '計算で出す値'));
+      var ul = el('ul');
+      t.computed.forEach(function (s) { ul.appendChild(el('li', null, s)); });
+      box.appendChild(ul);
+    }
+  });
+})();
+</script>
+</body>
+</html>

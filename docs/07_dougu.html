@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>道具とスプレッドシート版</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="page">
+<header>
+<p class="disc">架空の会社の資料です（自主制作）</p>
+<nav class="nav" aria-label="文書の移動">
+<a href="../index.html">目次へ</a>
+<a class="prev" href="06_gamen_ito.html">前の文書<span class="doc">（画面ごとの意図）</span></a>
+</nav>
+</header>
+
+<main>
+<h1>道具とスプレッドシート版</h1>
+<p>サンプルデータと原価表を作る Python の道具と、スプレッドシート版の例をまとめました。会社名は青嶺設備工業株式会社（架空）で、工事名、取引先名も全て架空です。</p>
+
+<nav class="toc" aria-label="この文書の目次">
+<ol>
+<li><a href="#python">Python の道具</a></li>
+<li><a href="#sheet">スプレッドシート版</a></li>
+</ol>
+</nav>
+
+<h2 id="python">Python の道具</h2>
+<p>tools の3本は Python 3 で動き、make_xlsx.py だけ openpyxl が要る。読み書きする場所は、どのフォルダから実行しても tools の1つ上のフォルダが基準になる。下のコマンドは、<a href="../README.md">README.md</a> のあるフォルダで実行する形だ。</p>
+<pre><code>pip install openpyxl</code></pre>
+
+<h3>make_data.py（サンプルデータを作る）</h3>
+<p><a href="../tools/make_data.py">tools/make_data.py</a> は、サンプルデータ assets/data.js を作り直す。</p>
+<pre><code>python tools/make_data.py</code></pre>
+<p>社員、取引先、工事と実行予算の当初は手で書いてある。発注から締めまでは、登録や承認などの操作を日付の順に並べた予定を上から実行して組み立てる。操作ごとに、起票と承認が別の人か、締め済の月の日付でないか、検収額が未検収残を超えないかなどを確かめる。合わない操作があれば、その場で止まる。</p>
+<p>乱数は、発注金額の端数、労務費の時間、請求書番号、操作の時刻に使う。乱数の種は 20260908、基準日は 2026-09-08 で固定しているので、何度走らせても同じ data.js になる。</p>
+<pre><code>SEED = 20260908
+rng = random.Random(SEED)
+
+BASE_DATE = '2026-09-08'
+COMPANY = '青嶺設備工業株式会社'
+LABOR_RATE = 4650
+CATS = ['材料費', '外注費', '労務費', '経費']
+ORDER_CATS = ['材料費', '外注費', '経費']
+MONTHS = ['2026-03', '2026-04', '2026-05', '2026-06', '2026-07', '2026-08', '2026-09']
+HEADER = '// 架空の会社の資料です（自主制作）'</code></pre>
+<p>全部の操作を終えたら表を1つにまとめ、項目の定義、状態遷移、権限、例外の場面の番号を足す。そのあと自己検査で件数の範囲と例外の場面に使う組み合わせを確かめ、続けて check_rules.py の検査も通す。1件でも不合格なら data.js を書き出さず、終了コード1で終わる。</p>
+
+<h3>check_rules.py（決まりごとに照らして検査する）</h3>
+<p><a href="../tools/check_rules.py">tools/check_rules.py</a> は、assets/data.js を業務の決まりごとに照らして検査する。項目ごとに合格か不合格かと、不合格なら該当の番号を出す。不合格が1件でもあれば終了コード1で終わる。</p>
+<pre><code>python tools/check_rules.py</code></pre>
+<p>工事ごと、費目ごとの予算、発注済、発生原価、計上額も出すときは --table を付ける。</p>
+<pre><code>python tools/check_rules.py --table</code></pre>
+<p>金額と判定は、Model というクラスが画面と同じ式で出す。承認した時点の未検収残のような過去の状態は、履歴をたどって出す。検査の項目と関数は次のとおり。</p>
+<table class="tbl stack">
+<thead><tr><th class="w8">項目</th><th class="w10">関数</th><th>見る事</th></tr></thead>
+<tbody>
+<tr><td data-label="項目">金額の整合</td><td data-label="関数"><code>check_amounts</code></td><td data-label="見る事">発注検収の累計が有効発注額以下、確認済の請求額が発注検収の累計以下、減額が承認の時点の未検収残以下。予算が当初と承認済の改定に合う。労務費の金額が時間×単価と一致する</td></tr>
+<tr><td data-label="項目">状態の整合</td><td data-label="関数"><code>check_states</code></td><td data-label="見る事">工事の状態と日付の有無と順。発注の状態と検収の累計。起票者が工事担当、承認者が購買で別の人。発注日が承認の履歴の日付と一致する。請求の確認者と計上月。完了の条件</td></tr>
+<tr><td data-label="項目">締めの期間</td><td data-label="関数"><code>check_closing</code></td><td data-label="見る事">締め済だった間に、その月の日付の記録が作られていない。締めは月の順で末日より後。解除は直近の月だけ。締めた時点で受付のままの請求と未計上の労務費が無い</td></tr>
+<tr><td data-label="項目">履歴の対応</td><td data-label="関数"><code>check_history</code></td><td data-label="見る事">日時の順、操作者と役割が社員の表と合うこと。登録、承認、取消、訂正、締めなどの操作に履歴があり、理由が要る操作に理由がある。対象と関連の番号が実在する</td></tr>
+<tr><td data-label="項目">場面</td><td data-label="関数"><code>check_scenes</code></td><td data-label="見る事">例外の場面と操作の流れの番号が実在し、場面の条件（予算超過、締め済の月の日付、二重の疑い、発注検収なし）を満たす</td></tr>
+<tr><td data-label="項目">公開禁止語</td><td data-label="関数"><code>check_words</code></td><td data-label="見る事">--words で渡した語の一覧が、公開するファイルに無い。語そのものは出さない</td></tr>
+</tbody>
+</table>
+<p>公開禁止語のほかの5項目は、次の関数でまとめて走る。make_data.py もこの関数を呼んでから data.js を書き出す。</p>
+<pre><code>def run_checks(S):
+    """項目ごとに (項目名, 該当の一覧) を返す。一覧が空なら合格。"""
+    M = Model(S)
+    return [
+        ('金額の整合', check_amounts(M)),
+        ('状態の整合', check_states(M)),
+        ('締めの期間', check_closing(M)),
+        ('履歴の対応', check_history(M, S)),
+        ('場面', check_scenes(M, S)),
+    ]</code></pre>
+
+<h3>make_xlsx.py（原価表の xlsx を作る）</h3>
+<p><a href="../tools/make_xlsx.py">tools/make_xlsx.py</a> は、assets/data.js から工事別の原価表 docs/02_genka_sample.xlsx を作り直す。</p>
+<pre><code>python tools/make_xlsx.py</code></pre>
+<p>集計の言葉は、ファイルの先頭で次のように定義している。予算、発注済、発生原価、残、消化率は、業務整理の文書の金額の言葉と同じ定義だ。</p>
+<table class="tbl stack">
+<thead><tr><th class="w8">言葉</th><th>定義</th></tr></thead>
+<tbody>
+<tr><td data-label="言葉">予算</td><td data-label="定義">当初の予算に、承認済の予算改定の差（改定後 − 改定前）を足した額</td></tr>
+<tr><td data-label="言葉">有効発注額</td><td data-label="定義">発注金額に、その発注を元にした承認済の減額発注を足した額</td></tr>
+<tr><td data-label="言葉">発注済</td><td data-label="定義">承認済と検収済の発注の有効発注額と、打切の発注の検収累計の和。労務費は計上済の労務費の和</td></tr>
+<tr><td data-label="言葉">発生原価</td><td data-label="定義">有効な発注検収の累計。労務費は計上済の労務費</td></tr>
+<tr><td data-label="言葉">残</td><td data-label="定義">予算 − 発注済</td></tr>
+<tr><td data-label="言葉">消化率</td><td data-label="定義">発注済 ÷ 予算。予算が 0 のときは無し</td></tr>
+<tr><td data-label="言葉"><span class="nw">粗利（発生原価ベース）</span></td><td data-label="定義">受注金額 − 発生原価の合計。受注金額が無ければ無し</td></tr>
+</tbody>
+</table>
+<p>シートは「原価表」の1枚。1行目に断り、2行目に表題と基準日を置き、4行目と5行目を見出しにする。見出しは2段で、列の並びは次の関数で決めている。</p>
+<pre><code>def columns():
+    """列の見出し（上の段、下の段）の並び。"""
+    cols = [('工事番号', ''), ('工事名', ''), ('状態', ''), ('受注金額（円）', '')]
+    for label in CATS + ['合計']:
+        cols += [(f'{label}（円）', '予算'), (f'{label}（円）', '発注済')]
+    cols += [('残（円）', ''), ('粗利（発生原価ベース、円）', '')]
+    return cols</code></pre>
+<p>費目と合計は上の段で2列をまとめ、下の段を予算と発注済に分ける。その下に工事15件の行と合計の行が続く。見出しの下と工事名の右で表示を固定し、印刷は A4 横で幅を1枚に収める。保存した後で読み戻し、作成者などの文書の情報が空になっていることを確かめる。</p>
+
+<h2 id="sheet">スプレッドシート版</h2>
+<p><a href="../tools/sheet/Code.gs">tools/sheet/Code.gs</a> は、発注、発注検収、請求、労務費を1つのスプレッドシートで持ち、締めと予算超過の確認を Google Apps Script で行う例だ。開くとメニューに「原価管理」が加わり、次の4つの操作ができる。</p>
+<table class="tbl stack">
+<thead><tr><th class="w10">操作</th><th>内容</th></tr></thead>
+<tbody>
+<tr><td data-label="操作">予算超過の一覧を作る</td><td data-label="内容">工事と費目ごとに予算と発注済を突き合わせ、発注済が予算を超えている組を「予算超過」シートに書き出す</td></tr>
+<tr><td data-label="操作">月を締める</td><td data-label="内容">最後に締めた月の次の月を締める。条件を満たさないときは締めず、満たしていない条件と該当の番号を出す</td></tr>
+<tr><td data-label="操作">締めを解除する</td><td data-label="内容">直近の締め済の月の締めを解除する。理由の入力が必須</td></tr>
+<tr><td data-label="操作">データの整合を点検する</td><td data-label="内容">4つの点検を行い、結果を「点検結果」シートに書き出す</td></tr>
+</tbody>
+</table>
+<p>このほか、発注、発注検収、請求、労務費のシートを編集したときに、締め済の月に入る編集を止める。画面版と違って役割ごとの権限は無く、誰でも全ての列を編集できる。</p>
+
+<h3>締め済の月に入る編集を止める仕組み</h3>
+<p>止める対象は、シートごとに CLOSE_GUARDS に持っている。行の月を決める列は dateColumns に持つ。締め済の月の行で直せない列は lockedColumns に持つ。</p>
+<table class="tbl stack">
+<thead><tr><th class="w8">シート</th><th class="w10">月を決める列</th><th>直せない列</th></tr></thead>
+<tbody>
+<tr><td data-label="シート">発注</td><td data-label="月を決める列">発注日</td><td data-label="直せない列">工事番号、関連発注番号、費目、発注金額</td></tr>
+<tr><td data-label="シート">発注検収</td><td data-label="月を決める列">検収日</td><td data-label="直せない列">発注番号、検収額、状態</td></tr>
+<tr><td data-label="シート">請求</td><td data-label="月を決める列">計上月</td><td data-label="直せない列">発注番号、請求額、状態</td></tr>
+<tr><td data-label="シート">労務費</td><td data-label="月を決める列">月、計上日</td><td data-label="直せない列">工事、時間、単価、金額</td></tr>
+</tbody>
+</table>
+<p>セルが編集されると、onEdit が編集されたシートの組を CLOSE_GUARDS から探して guardClosedMonths_ に渡す。月を決める列にも直せない列にも触れない編集は、そのまま通す。触れていれば、closedMonthState_ で設定シートの締め済の月を読む。</p>
+<p>締め済かどうかの判定は次の関数で行う。一覧にある月のほか、一覧の最初の月より前の月も締め済として扱う。最後に締めた月の次の月を、入れてよい最初の月として持つ。</p>
+<pre><code>function closedMonthState_() {
+  const list = readClosedMonths_();
+  const months = new Set(list.map((x) =&gt; x.month));
+  const first = list.length &gt; 0 ? list[0].month : '';
+  return {
+    isEmpty: list.length === 0,
+    has: (month) =&gt; month !== '' &amp;&amp; (months.has(month) || month &lt; first),
+    firstOpen: list.length &gt; 0 ? nextMonthKey_(list[list.length - 1].month) : '',
+  };
+}</code></pre>
+<p>1つのセルの編集は guardSingleCell_ が受け持つ。reasonToStop_ が止める理由を返したときは、元の値に戻し、セルに注記を付け、画面の右下に知らせる。止めるのは次の3つのときだ。</p>
+<ul>
+<li>締め済の月の日付を入れた</li>
+<li>締め済の月の日付を変えたり消したりした</li>
+<li>締め済の月の行で、直せない列か、行の月を決めるほかの列を変えた</li>
+</ul>
+<p>締め済の月の日付を入れたときは「2026-07 は締め済のため入れられません。2026-08 以後の日付にします。」の形で知らせる。</p>
+<p>貼り付けのように複数のセルをまとめて変えたときは、元の値が取れないため戻さない。guardManyCells_ が締め済の月の行に当たるセルに注記を付け、元に戻すよう知らせる。戻すには編集の取り消し（Ctrl+Z）を使う。行の削除と、設定シートの締め済の月の書き換えでは働かない。入力の誤りを止める仕組みなので、書き換えを防ぐにはシートの保護を併せて使う。</p>
+
+<h3>入れ方</h3>
+<p>手順の全文は <a href="../tools/sheet/README.md">tools/sheet/README.md</a> にある。要点は次のとおり。</p>
+<ol>
+<li>新しいスプレッドシートで「拡張機能」から「Apps Script」を開き、最初からあるファイルの中身を Code.gs の中身に置き換えて保存する。</li>
+<li>setupSheets を実行し、初めてのときに出る承認の画面で許可する。足りないシートが見出しつきで作られる。</li>
+<li>設定シートに基準日、標準の時間単価、操作者と、期首の前の月（締めの種類は「繰越」）を入れ、各シートにデータを入れる。</li>
+<li>スプレッドシートを開き直すと、メニューに「原価管理」が出る。onOpen と onEdit は単純トリガーなので、トリガーの設定は要らない。</li>
+</ol>
+</main>
+
+<footer class="disc">
+<p>公開されている情報と一般的な商慣行をもとにした自主制作です。</p>
+<p>実在する企業の業務、データ、資料は使っていません。</p>
+<p>確認が要る事柄は、決めつけずに分けてあります。</p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540">
+  <style>
+    text { font-family: system-ui, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo"; fill: #222222; }
+    .state { font-size: 18px; font-weight: 700; text-anchor: middle; dominant-baseline: middle; }
+    .action { font-size: 13px; font-weight: 700; fill: #1d4478; text-anchor: middle; }
+    .action-note { font-size: 12px; fill: #4d4d4d; }
+    .heading { font-size: 16px; font-weight: 700; }
+    .body { font-size: 13px; }
+    .box { fill: #ffffff; stroke: #dcdcdc; stroke-width: 1.5; }
+    .focus-box { fill: #eef3f9; stroke: #a9c0de; stroke-width: 1.5; }
+    .edge { fill: none; stroke: #1d4478; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+  <rect x="0" y="0" width="960" height="540" fill="#f3f3f3"/>
+
+  <rect x="25" y="50" width="140" height="64" rx="6" class="box"/>
+  <text x="95" y="83" class="state">未締め</text>
+  <rect x="795" y="50" width="140" height="64" rx="6" class="focus-box"/>
+  <text x="865" y="83" class="state" fill="#1d4478">締め済</text>
+
+  <path d="M165 68 H795" class="edge"/>
+  <polygon points="795,68 783,62 783,74" fill="#1d4478"/>
+  <text x="480" y="58" class="action">締める</text>
+  <path d="M795 96 H165" class="edge"/>
+  <polygon points="165,96 177,90 177,102" fill="#1d4478"/>
+  <text x="480" y="111" class="action">締め解除</text>
+  <path d="M165 107 V129 H795 V107" class="edge"/>
+  <polygon points="795,107 789,119 801,119" fill="#1d4478"/>
+  <rect x="448" y="118" width="64" height="19" fill="#f3f3f3"/>
+  <text x="480" y="133" class="action">再締め</text>
+
+  <text x="20" y="158" class="action-note"><tspan x="20" y="158">「締める」: 経理のみ。</tspan><tspan x="20" y="175">確認を出してから締める。</tspan></text>
+  <text x="303" y="158" class="action-note"><tspan x="303" y="158">「締め解除」: 経理のみ。直近の締め済の月だけ。</tspan><tspan x="303" y="175">理由が必須。3月（繰越）は解除できない。</tspan></text>
+  <text x="672" y="158" class="action-note"><tspan x="672" y="158">「再締め」: 条件を判定し直す。</tspan><tspan x="672" y="175">履歴に「第2回」のように締めた回数を残す。</tspan></text>
+
+  <rect x="20" y="200" width="440" height="290" rx="6" class="box"/>
+  <text x="40" y="239" class="heading">締める条件（全て満たすと押せる）</text>
+  <text x="40" y="270" class="body">1. その月の末日が基準日より前</text>
+  <text x="40" y="297" class="body">2. 前の月が締め済（4月は3月の繰越で満たす）</text>
+  <text x="40" y="324" class="body"><tspan x="40" y="324">3. 請求書の日付がその月以前で受付のままの</tspan><tspan x="58" y="344">請求が無い（差戻しと取消は止めない）</tspan></text>
+  <text x="40" y="373" class="body"><tspan x="40" y="373">4. その月に施工中だった工事の労務費が</tspan><tspan x="58" y="393">全て計上済</tspan></text>
+  <line x1="40" y1="420" x2="440" y2="420" stroke="#dcdcdc"/>
+  <text x="40" y="447" class="body"><tspan x="40" y="447">警告として出すが止めない: 納期を過ぎて未検収の発注、</tspan><tspan x="40" y="467">起票のままの発注</tspan></text>
+
+  <rect x="480" y="200" width="460" height="290" rx="6" class="box"/>
+  <text x="500" y="235" class="heading">締め済の月の扱い</text>
+  <text x="500" y="266" class="body"><tspan x="500" y="266">締め済の月には、検収日と労務費の計上日を置けず、</tspan><tspan x="500" y="286">請求の計上月にも選べない。</tspan></text>
+  <text x="500" y="318" class="body"><tspan x="500" y="318">訂正: 締め済の月の発注検収は取り消せない。</tspan><tspan x="500" y="338">当月の日付で訂正（マイナス額）を登録する。</tspan><tspan x="500" y="358">締め済の月の数字は変えず、訂正は検収日の月に入る。</tspan></text>
+  <text x="500" y="391" class="body"><tspan x="500" y="391">過月分: 請求書の日付の月が締め済で、</tspan><tspan x="500" y="411">それより後の月を計上月にした請求。</tspan><tspan x="500" y="431">一覧に札で出し、履歴に「過月分」と残す。</tspan></text>
+  <text x="500" y="469" class="body">請求の受付は締めに関係なくいつでもできる。</text>
+</svg>

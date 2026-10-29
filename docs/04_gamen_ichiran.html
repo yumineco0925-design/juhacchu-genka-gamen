@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>画面の一覧と遷移</title>
+<link rel="stylesheet" href="docs.css">
+</head>
+<body>
+<div class="page">
+<header>
+<p class="disc">架空の会社の資料です（自主制作）</p>
+<nav class="nav" aria-label="文書の移動">
+<a href="../index.html">目次へ</a>
+<a class="prev" href="03_gyomu_seiri.html">前の文書<span class="doc">（業務整理）</span></a>
+<a href="05_koumoku.html">次の文書<span class="doc">（項目の定義）</span></a>
+</nav>
+</header>
+
+<main>
+<h1>画面の一覧と遷移</h1>
+<p>設備工事の会社の業務画面8枚について、役割と行き来、権限、状態の変わり方を整理しました。会社名は<span id="kaisha">青嶺設備工業株式会社</span>（架空）で、工事名、取引先名も全て架空です。</p>
+
+<nav class="toc" aria-label="この文書の目次">
+<ol>
+<li><a href="#ichiran">8画面の一覧</a></li>
+<li><a href="#seni">画面の行き来</a></li>
+<li><a href="#kengen">役割ごとの権限</a></li>
+<li><a href="#jotai">状態遷移の表</a></li>
+</ol>
+</nav>
+
+<h2 id="ichiran">8画面の一覧</h2>
+<table class="tbl stack wide">
+<thead><tr><th>画面名</th><th>誰が使うか</th><th class="w10">何のための<br>画面か</th><th>入口</th><th>出口</th><th>主な項目の数</th></tr></thead>
+<tbody>
+<tr>
+<td class="nw" data-label="画面名">工事一覧</td>
+<td data-label="誰が使うか"><span class="nw">全員</span><span class="nw">（工事の</span><span class="nw">登録は</span><span class="nw">営業）</span></td>
+<td class="ph" data-label="目的">工事を探して開き、自分の役割で待っている操作を確かめる</td>
+<td class="nw" data-label="入口">最初の画面<br>メニュー</td>
+<td class="nw" data-label="出口">工事詳細</td>
+<td class="nw" data-label="主な項目の数">工事 19</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">工事詳細</td>
+<td data-label="誰が使うか"><span class="nw">全員</span><span class="nw">（項目差</span><span class="nw">あり）</span></td>
+<td class="ph" data-label="目的">1件の工事の状態を進めたり<wbr>戻したりし、費目ごとの予算と実績、予算の改定、発注、労務費、履歴を見る</td>
+<td class="nw" data-label="入口">工事一覧<br>予算と実績の差異<br>発注の詳細<br>月次の締め</td>
+<td class="nw" data-label="出口">発注の登録<br>発注の詳細</td>
+<td class="nw" data-label="主な項目の数">工事 19<br>予算改定 10</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">発注の登録、<br>発注の詳細</td>
+<td data-label="誰が使うか"><span class="nw">工事担当</span><span class="nw">（起票、</span><span class="nw">再提出）、</span><span class="nw">購買</span><span class="nw">（承認、</span><span class="nw">修正依頼、</span><span class="nw">打切、</span><span class="nw">取消）</span></td>
+<td class="ph" data-label="目的">発注を起票し、承認、修正依頼、再提出、取消、打切を行う。追加発注と減額発注もここから起票する</td>
+<td class="nw" data-label="入口">工事詳細<br>発注検収の登録<br>請求の確認<br>取引先の一覧</td>
+<td class="nw" data-label="出口">工事詳細<br>発注検収の登録</td>
+<td class="nw" data-label="主な項目の数">発注 14</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">発注検収の登録</td>
+<td data-label="誰が使うか"><span class="nw">工事担当、</span><span class="nw">購買</span></td>
+<td class="ph" data-label="目的">発注ごとに検収日と検収額を登録し、取消と訂正を行う</td>
+<td class="nw" data-label="入口">メニュー<br>発注の詳細<br>請求の確認<br>月次の締め</td>
+<td class="nw" data-label="出口">発注の詳細</td>
+<td class="nw" data-label="主な項目の数">発注検収 10</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">請求の確認</td>
+<td class="nw" data-label="誰が使うか">経理</td>
+<td class="ph" data-label="目的">受け付けた請求を発注検収の累計と照らし、計上月を選んで確認済にするか、差戻しか取消にする</td>
+<td class="nw" data-label="入口">メニュー<br>月次の締め</td>
+<td class="nw" data-label="出口">発注の詳細<br>発注検収の登録</td>
+<td class="nw" data-label="主な項目の数">請求 13</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">予算と実績の差異</td>
+<td data-label="誰が使うか"><span class="nw">営業、</span><span class="nw">工事担当、</span><span class="nw">経理</span></td>
+<td class="ph" data-label="目的">工事と費目ごとに予算、発注済、発生原価を並べて超過を見つけ、CSV で書き出す</td>
+<td class="nw" data-label="入口">メニュー</td>
+<td class="nw" data-label="出口">工事詳細</td>
+<td class="nw" data-label="主な項目の数">集計の列 5</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">取引先の一覧</td>
+<td data-label="誰が使うか"><span class="nw">全員</span><span class="nw">（項目差</span><span class="nw">あり）</span></td>
+<td class="ph" data-label="目的">取引先を区分と名称で探し、発注の履歴と支払予定を見る</td>
+<td class="nw" data-label="入口">メニュー</td>
+<td class="nw" data-label="出口">発注の詳細</td>
+<td class="nw" data-label="主な項目の数">取引先 8</td>
+</tr>
+<tr>
+<td class="nw" data-label="画面名">月次の締め</td>
+<td class="nw" data-label="誰が使うか">経理</td>
+<td class="ph" data-label="目的">締めを止めている項目を確かめ、労務費を計上して月を締める。締めの解除もここで行う</td>
+<td class="nw" data-label="入口">メニュー</td>
+<td class="nw" data-label="出口">請求の確認<br>発注検収の登録<br>工事詳細</td>
+<td class="nw" data-label="主な項目の数">労務費の<br>計上 7</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="seni">画面の行き来</h2>
+<figure class="fig">
+<img src="img/flow_gamen.svg" width="960" height="688" alt="メニューと8画面の入口と出口を矢印で結んだ図。">
+<figcaption><span>画面の遷移</span><a class="open" href="img/flow_gamen.svg">図だけを開く</a></figcaption>
+</figure>
+
+<h2 id="kengen">役割ごとの権限</h2>
+<p>起票と承認は別の役割にしてあり、発注は工事担当が起票して購買が承認し、予算改定は工事担当が起案して営業が承認します。</p>
+<figure class="fig">
+<img src="img/kengen.svg" width="960" height="720" alt="営業、工事担当、購買、経理の4つの役割が、20の操作をそれぞれできるかどうかを示した図。">
+<figcaption><span>役割ごとの権限</span><a class="open" href="img/kengen.svg">図だけを開く</a></figcaption>
+</figure>
+
+<h2 id="jotai">状態遷移の表</h2>
+<p>操作ごとに、状態の変わり方、できる役割、前提、後始末、取消の方法を対象別に並べます。</p>
+<div id="jotai-hyo">
+<noscript><p class="muted">この表は JavaScript を有効にすると表示されます。</p></noscript>
+</div>
+</main>
+
+<footer class="disc">
+<p>公開されている情報と一般的な商慣行をもとにした自主制作です。</p>
+<p>実在する企業の業務、データ、資料は使っていません。</p>
+<p>確認が要る事柄は、決めつけずに分けてあります。</p>
+</footer>
+</div>
+
+<script src="../assets/data.js"></script>
+<script>
+// 会社名を設定から入れ、状態遷移の表を対象ごとに組む
+(function () {
+  var S = window.SAMPLE;
+  var box = document.getElementById('jotai-hyo');
+  if (!S || !S.transitions) {
+    var p = document.createElement('p');
+    p.className = 'muted';
+    p.textContent = '表のデータを読み込めませんでした。';
+    box.appendChild(p);
+    return;
+  }
+
+  if (S.settings && S.settings.company) {
+    document.getElementById('kaisha').textContent = S.settings.company;
+  }
+
+  var T = S.transitions;
+  // 対象は見出しで示すので、表の列からは外す
+  var cols = T.columns.filter(function (c) { return c.key !== 'target'; });
+  var notes = T.notes || {};
+
+  var groups = [];
+  var byTarget = {};
+  T.rows.forEach(function (r) {
+    if (!byTarget[r.target]) {
+      byTarget[r.target] = [];
+      groups.push(r.target);
+    }
+    byTarget[r.target].push(r);
+  });
+
+  // 列幅は8表で同じにする。幅の無い列（取消の方法）が残りの幅を取る
+  var WIDTH = { op: 'w8', from: 'w7', to: 'w5', roles: 'w5', pre: 'w9', after: 'w10' };
+  // 状態は括弧の前でだけ折り返し、操作と文の列は文節の切れ目で折り返す
+  var WRAP = { op: 'ph', from: 'ka', to: 'ka', roles: 'nw', pre: 'ph', after: 'ph', undo: 'ph' };
+
+  function el(tag, text, cls) {
+    var e = document.createElement(tag);
+    if (text != null) e.textContent = text;
+    if (cls) e.className = cls;
+    return e;
+  }
+
+  groups.forEach(function (target) {
+    box.appendChild(el('h3', target));
+
+    var table = el('table', null, 'tbl stack wide fixed dense');
+    var thead = el('thead');
+    var htr = el('tr');
+    cols.forEach(function (c) {
+      var th = el('th', null, WIDTH[c.key] || null);
+      // 「変更前の状態」は「変更前の」と「状態」の2行にして列を細くする
+      var m = /^(.+の)(状態)$/.exec(c.name);
+      if (m) {
+        th.appendChild(document.createTextNode(m[1]));
+        th.appendChild(document.createElement('br'));
+        th.appendChild(document.createTextNode(m[2]));
+      } else {
+        th.textContent = c.name;
+      }
+      htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    table.appendChild(thead);
+
+    var tbody = el('tbody');
+    byTarget[target].forEach(function (r) {
+      var tr = el('tr');
+      cols.forEach(function (c) {
+        var v = r[c.key] == null ? '' : String(r[c.key]);
+        var td;
+        if (c.key === 'roles') {
+          // 役割は1行に1つずつ出す
+          td = el('td', null, WRAP.roles);
+          v.split('、').forEach(function (name, i) {
+            if (i) td.appendChild(document.createElement('br'));
+            td.appendChild(document.createTextNode(name));
+          });
+        } else {
+          td = el('td', v, WRAP[c.key] || null);
+        }
+        td.setAttribute('data-label', c.name);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    box.appendChild(table);
+
+    if (notes[target] && notes[target].length) {
+      var ul = el('ul', null, 'small muted');
+      notes[target].forEach(function (n) { ul.appendChild(el('li', n)); });
+      box.appendChild(ul);
+    }
+  });
+})();
+</script>
+</body>
+</html>

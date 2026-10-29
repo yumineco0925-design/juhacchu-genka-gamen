@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>帳票のサンプル</title>
+<link rel="stylesheet" href="docs.css">
+<style>
+/* 原価表の列が多いので、この文書だけ紙面を広げる。文章は読みやすい幅に留める */
+@media (min-width: 641px) {
+  .page.wide { max-width: 1240px; padding-left: 24px; padding-right: 24px; }
+}
+.wide main > p, .wide .toc, .wide .kv { max-width: 680px; }
+p + .kv { margin-top: 12px; }
+
+/* 発注書の紙面 */
+.sheet {
+  max-width: 680px;
+  margin: 16px 0 8px;
+  padding: 28px 32px 24px;
+  border: 1px solid var(--ink-3);
+  background: var(--surface);
+}
+.sheet-title { margin-bottom: 20px; text-align: center; font-size: var(--fs-h1); font-weight: 600; letter-spacing: 0.3em; }
+.sheet-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 12px 24px; }
+.sheet-to .to { padding-bottom: 2px; border-bottom: 1px solid var(--ink); font-size: var(--fs-h2); }
+.sheet-to .to + p { margin-top: 10px; }
+.sheet-no { display: grid; grid-template-columns: auto auto; gap: 0 12px; font-size: var(--fs-s); }
+.sheet-no dt { color: var(--ink-2); }
+.sheet-from { margin-top: 12px; text-align: right; }
+.sheet-amount {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 16px;
+  margin: 16px 0 4px;
+  padding: 8px 12px;
+  border: 1px solid var(--ink-3);
+}
+.sheet-amount .num { font-size: var(--fs-h2); }
+.sheet .tbl th { width: 7em; }
+.tbl.sheet-sign { width: auto; margin: 16px 0 0 auto; }
+.tbl.sheet-sign th, .tbl.sheet-sign td { width: 6.5em; text-align: center; }
+.tbl.sheet-sign td { height: 3.2em; vertical-align: middle; }
+
+/* 原価表 */
+.xl { overflow-x: auto; }
+.genka { font-size: var(--fs-s); }
+.genka th, .genka td { padding: 4px 6px; }
+.genka thead th { vertical-align: bottom; }
+.genka thead th.grp { text-align: center; }
+.genka tr.sum, .genka tr.sum td { background: var(--bg); }
+.genka-note { margin-top: 16px; }
+
+@media (max-width: 640px) {
+  .sheet { padding: 16px 14px; }
+  .xl { overflow: visible; }
+  .genka { font-size: var(--fs); }
+  .genka td { padding-left: 12em; }
+  .genka td::before { width: 11.5em; }
+  .genka tr.sum td:first-child { padding-left: 0; }
+  .genka tr.sum td:first-child::before { content: none; }
+}
+
+@media print {
+  .page.wide { max-width: none; }
+  .sheet { break-inside: avoid; }
+  .xl { overflow: visible; }
+}
+</style>
+</head>
+<body>
+<div class="page wide">
+<header>
+<p class="disc">架空の会社の資料です（自主制作）</p>
+<nav class="nav" aria-label="文書の移動">
+<a href="../index.html">目次へ</a>
+<a class="prev" href="01_kikitori.html">前の文書<span class="doc">（聞き取りのメモ）</span></a>
+<a href="03_gyomu_seiri.html">次の文書<span class="doc">（業務整理）</span></a>
+</nav>
+</header>
+
+<main>
+<h1>帳票のサンプル</h1>
+<p>今の業務で使っている紙の発注書と、表計算で作る工事別の原価表です。値は基準日 <span id="base-date">2026-09-08</span> の時点です。会社名は青嶺設備工業株式会社（架空）で、工事名、取引先名も全て架空です。</p>
+
+<nav class="toc" aria-label="この文書の目次">
+<ol>
+<li><a href="#hacchusho">発注書</a></li>
+<li><a href="#genka">原価表</a></li>
+</ol>
+</nav>
+
+<h2 id="hacchusho">発注書</h2>
+<p>工事担当が起票し、購買が承認して取引先に送ります。承認した日が発注日です。経理は、届いた請求書をこの控えと突き合わせます。</p>
+
+<section class="sheet" id="sheet" aria-label="発注書">
+<p class="small muted">架空の会社の資料です（自主制作）</p>
+<p class="sheet-title">発注書</p>
+<div class="sheet-top">
+<div class="sheet-to">
+<p class="to"><span data-f="partner"></span> 御中</p>
+<p class="small">下記のとおり発注します。</p>
+</div>
+<dl class="sheet-no">
+<dt>発注番号</dt><dd class="nw" data-f="no"></dd>
+<dt>発注日</dt><dd class="nw" data-f="orderedOn"></dd>
+</dl>
+</div>
+<p class="sheet-from" data-f="company"></p>
+<div class="sheet-amount">
+<span>発注金額（税抜）</span>
+<span class="num"><span data-f="amount"></span>円</span>
+</div>
+<table class="tbl">
+<tbody>
+<tr><th scope="row">工事</th><td data-f="kouji"></td></tr>
+<tr><th scope="row">工事場所</th><td data-f="site"></td></tr>
+<tr><th scope="row">件名</th><td data-f="title"></td></tr>
+<tr><th scope="row">納期</th><td data-f="due"></td></tr>
+<tr><th scope="row">支払条件</th><td data-f="terms"></td></tr>
+<tr><th scope="row">備考</th><td data-f="note"></td></tr>
+</tbody>
+</table>
+<table class="tbl sheet-sign">
+<thead><tr><th scope="col">起票者</th><th scope="col">承認者</th></tr></thead>
+<tbody><tr><td data-f="drafter"></td><td data-f="approver"></td></tr></tbody>
+</table>
+</section>
+
+<h2 id="genka">原価表</h2>
+<p>工事ごとに、費目別の予算と発注済、残、粗利（発生原価ベース）を1行に並べた表です。</p>
+<p>同じ表の Excel は <a href="02_genka_sample.xlsx" download>02_genka_sample.xlsx</a> です。</p>
+<dl class="kv">
+<dt>予算</dt><dd>実行予算（当初）に、承認済の予算改定の差額を足した今の額。費目ごとに持つ</dd>
+<dt>発注済</dt><dd>発注で使うと決まった額。承認済と検収済の発注の有効発注額に、打切の発注の発注検収の累計を足す。起票と取消は入れない。労務費は計上額の累計を入れる</dd>
+<dt>有効発注額</dt><dd>発注金額に、その発注を元にした承認済の減額発注を足した額</dd>
+<dt>残</dt><dd>予算のうち、まだ発注に使える額。予算 − 発注済</dd>
+<dt>粗利<span class="nw">（発生原価</span><span class="nw">ベース）</span></dt><dd>今の時点の粗利。受注金額 − 発生原価（全費目）。発生原価は有効な発注検収の累計（訂正のマイナスを含む）と労務費の計上額の和</dd>
+</dl>
+
+<p class="small muted genka-note">金額は全て税抜です。</p>
+<div class="xl">
+<table class="tbl stack genka" id="genka-hyo">
+<thead>
+<tr>
+<th scope="col" rowspan="2">工事番号</th>
+<th scope="col" rowspan="2">工事名</th>
+<th scope="col" rowspan="2">状態</th>
+<th scope="col" rowspan="2" class="num">受注金額<br>（円）</th>
+<th scope="colgroup" colspan="2" class="grp">材料費（円）</th>
+<th scope="colgroup" colspan="2" class="grp">外注費（円）</th>
+<th scope="colgroup" colspan="2" class="grp">労務費（円）</th>
+<th scope="colgroup" colspan="2" class="grp">経費（円）</th>
+<th scope="colgroup" colspan="2" class="grp">合計（円）</th>
+<th scope="col" rowspan="2" class="num">残<br>（円）</th>
+<th scope="col" rowspan="2" class="num">粗利<br>（発生原価<br>ベース、円）</th>
+</tr>
+<tr>
+<th scope="col" class="num">予算</th><th scope="col" class="num">発注済</th>
+<th scope="col" class="num">予算</th><th scope="col" class="num">発注済</th>
+<th scope="col" class="num">予算</th><th scope="col" class="num">発注済</th>
+<th scope="col" class="num">予算</th><th scope="col" class="num">発注済</th>
+<th scope="col" class="num">予算</th><th scope="col" class="num">発注済</th>
+</tr>
+</thead>
+<tbody id="genka-body"></tbody>
+</table>
+</div>
+<noscript><p class="muted">発注書と原価表の値は JavaScript を有効にすると表示されます。</p></noscript>
+</main>
+
+<footer class="disc">
+<p>公開されている情報と一般的な商慣行をもとにした自主制作です。</p>
+<p>実在する企業の業務、データ、資料は使っていません。</p>
+<p>確認が要る事柄は、決めつけずに分けてあります。</p>
+</footer>
+</div>
+<script src="../assets/data.js"></script>
+<script src="../assets/app.js"></script>
+<script>
+// 発注書と原価表の値を data.js から入れる。集計は App.calc.kouji を使う
+(function () {
+  var ORDER = '26-009-03';
+  var CATS = ['材料費', '外注費', '労務費', '経費'];
+  var body = document.getElementById('genka-body');
+  var WJ = String.fromCharCode(0x2060);
+
+  function el(tag, attrs, text) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  }
+
+  if (!window.App || !App.calc) {
+    body.appendChild(el('tr', null)).appendChild(el('td', null, '原価表のデータを読み込めませんでした。'));
+    return;
+  }
+  var D = App.data();
+  var SET = App.settings();
+  var yen = App.fmt.yen;
+  document.getElementById('base-date').textContent = SET.baseDate;
+
+  // 発注書
+  var o = App.find('orders', ORDER);
+  if (o) {
+    var k = App.find('kouji', o.kouji) || {};
+    var p = App.find('partners', o.partner) || {};
+    var f = {
+      partner: p.name || '',
+      no: o.no,
+      orderedOn: App.fmt.date(o.orderedOn),
+      company: SET.companyLabel,
+      amount: yen(o.amount),
+      kouji: o.kouji + ' ' + (k.name || ''),
+      site: k.site || '',
+      title: o.title,
+      due: App.fmt.date(o.due),
+      terms: p.terms || '',
+      note: o.note || '',
+      drafter: App.empName(o.drafter),
+      approver: App.empName(o.approver)
+    };
+    Array.prototype.forEach.call(document.querySelectorAll('#sheet [data-f]'), function (n) {
+      n.textContent = f[n.getAttribute('data-f')];
+    });
+  }
+
+  // 原価表。列は 工事番号、工事名、状態、受注金額、費目ごとの予算と発注済、合計、残、粗利（発生原価ベース）
+  var sums = null;
+  function add(i, v) {
+    if (v === null || v === undefined) return;
+    sums[i] = (sums[i] || 0) + v;
+  }
+  // 工事名の末尾の1字だけが次の行に落ちないよう、末尾の2字を U+2060 でつなぐ
+  function tie(v) { return String(v).replace(/(.)(.)$/, '$1' + WJ + '$2'); }
+
+  function cells(tr, values) {
+    values.forEach(function (c) {
+      tr.appendChild(el('td', { 'class': c[2] || 'num', 'data-label': c[0] }, c[1]));
+    });
+  }
+
+  D.kouji.forEach(function (k) {
+    var c = App.calc.kouji(k);
+    var vals = [c.contract];
+    c.rows.forEach(function (r) { vals.push(r.budget, r.committed); });
+    vals.push(c.total.budget, c.total.committed, c.total.remain, c.profit);
+    if (!sums) sums = vals.map(function () { return null; });
+    vals.forEach(function (v, i) { add(i, v); });
+
+    var tr = el('tr', { 'data-no': k.no });
+    cells(tr, [['工事番号', k.no, 'nw'], ['工事名', tie(k.name), ' '], ['状態', k.status, 'nw']]);
+    cells(tr, labels().map(function (label, i) { return [label, yen(vals[i])]; }));
+    body.appendChild(tr);
+  });
+
+  function labels() {
+    var list = ['受注金額（円）'];
+    CATS.concat(['合計']).forEach(function (cat) {
+      list.push(cat + ' 予算（円）', cat + ' 発注済（円）');
+    });
+    return list.concat(['残（円）', '粗利（発生原価ベース、円）']);
+  }
+
+  if (sums) {
+    var tr = el('tr', { 'class': 'sum', 'data-no': '合計' });
+    tr.appendChild(el('td', { colspan: '3', 'data-label': '' }, '合計'));
+    cells(tr, labels().map(function (label, i) { return [label, yen(sums[i])]; }));
+    body.appendChild(tr);
+  }
+})();
+</script>
+</body>
+</html>

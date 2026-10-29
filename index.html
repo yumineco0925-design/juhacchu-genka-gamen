@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>設備工事会社の受発注と原価の画面設計（自主制作）</title>
+<link rel="stylesheet" href="docs/docs.css">
+<style>
+:root {
+  --c-900: #0e2645;
+  --c-800: #15345e;
+  --c-700: #1d4478;
+  --c-500: #4a74ad;
+  --c-300: #a9c0de;
+  --c-100: #d6e2f1;
+  --c-50: #eef3f9;
+}
+body {
+  background: #ffffff;
+  font-size: 16px;
+  line-height: 1.75;
+}
+.page.index-page {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: #ffffff;
+}
+.index-page a {
+  color: var(--c-700);
+  text-decoration-thickness: 1px;
+  text-underline-offset: .2em;
+}
+.index-page a:hover {
+  color: var(--c-900);
+  text-decoration-thickness: 2px;
+}
+.index-page a:focus-visible {
+  outline: 3px solid var(--c-500);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+.index-page header {
+  border-bottom: 1px solid #dcdcdc;
+}
+.index-page header .disc {
+  width: min(1240px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: #4d4d4d;
+  font-size: .8rem;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 250px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  width: min(1240px, calc(100% - 48px));
+  margin: 0 auto;
+}
+.title {
+  grid-column: 2;
+  grid-row: 1;
+  padding: 44px 0 28px 64px;
+  border-left: 1px solid #dcdcdc;
+}
+.local-nav {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+  align-self: start;
+  position: sticky;
+  top: 0;
+  padding: 44px 34px 64px 0;
+}
+.local-nav a {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #dcdcdc;
+  color: #4d4d4d;
+  font-size: .86rem;
+  font-weight: 650;
+  text-decoration: none;
+}
+.local-nav a:first-child {
+  border-top: 4px solid var(--c-800);
+}
+.local-nav a:hover {
+  color: var(--c-900);
+}
+main {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  border-left: 1px solid #dcdcdc;
+}
+.index-page h1 {
+  max-width: 18em;
+  margin: 0;
+  color: var(--c-900);
+  font-size: clamp(2.2rem, 3.6vw, 3.4rem);
+  font-weight: 760;
+  letter-spacing: -.045em;
+  line-height: 1.12;
+}
+h1 .title-line {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+}
+.intro {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 22em) minmax(0, 1fr);
+  gap: 24px 40px;
+  align-items: start;
+  padding: 0 0 32px 64px;
+}
+.index-page .kv {
+  grid-template-columns: max-content minmax(0, 1fr);
+  border: 1px solid #dcdcdc;
+}
+.index-page .kv dt, .index-page .kv dd {
+  padding: 8px 14px;
+  border-bottom: 1px solid #dcdcdc;
+}
+.index-page .kv dt {
+  color: #757575;
+  font-size: .72rem;
+  font-weight: 700;
+  line-height: 1.9;
+}
+.index-page .kv dd {
+  color: var(--c-900);
+  font-weight: 700;
+  line-height: 1.45;
+  word-break: keep-all;
+  overflow-wrap: normal;
+}
+.index-page .kv dt:last-of-type,
+.index-page .kv dd:last-of-type {
+  border-bottom: 0;
+}
+.value-chunk {
+  display: inline-block;
+  white-space: nowrap;
+}
+.index-lead {
+  color: #4d4d4d;
+  font-size: 1.08rem;
+}
+.screen-window {
+  margin: 0 0 64px 64px;
+  padding: 16px;
+  border: 1px solid var(--c-300);
+  background: var(--c-50);
+}
+.screen-link {
+  display: block;
+  overflow: hidden;
+  background: #ffffff;
+}
+.screen-link img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.index-page section {
+  padding: 56px 0 64px 64px;
+  border-top: 1px solid #dcdcdc;
+}
+.index-page section > * + * {
+  margin-top: 24px;
+}
+.index-page h2 {
+  margin: 0 0 32px;
+  padding: 0;
+  border: 0;
+  color: var(--c-900);
+  font-size: clamp(1.8rem, 3.2vw, 3rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+  scroll-margin-top: 18px;
+}
+.index-page h2::before {
+  content: "";
+  display: block;
+  width: 42px;
+  height: 7px;
+  margin-bottom: 16px;
+  background: var(--c-700);
+}
+.index-page section > p,
+.index-page section > ul {
+  max-width: 46em;
+}
+.index-list {
+  padding: 0;
+  list-style: none;
+}
+.index-list > li {
+  display: grid;
+  grid-template-columns:
+    minmax(220px, .78fr) minmax(0, 1.22fr);
+  gap: 28px;
+  padding: 22px;
+  border-top: 1px solid #dcdcdc;
+}
+.index-list > li:nth-child(odd) {
+  background: var(--c-50);
+}
+.index-list > li:last-child {
+  border-bottom: 1px solid #dcdcdc;
+}
+.index-list > li > a {
+  align-self: start;
+  color: var(--c-800);
+  font-weight: 750;
+}
+.index-list > li > p {
+  color: #4d4d4d;
+}
+.index-page .fig {
+  border: 1px solid #dcdcdc;
+  background: #ffffff;
+}
+.index-page .fig img {
+  border: 0;
+  border-radius: 0;
+}
+.index-page .fig figcaption {
+  margin: 0;
+  padding: 6px 14px;
+  border-top: 1px solid #dcdcdc;
+  gap: 0 24px;
+}
+.index-page section ul {
+  padding-left: 1.35em;
+}
+.index-page section ul li + li {
+  margin-top: 12px;
+}
+.index-page footer.disc {
+  margin: 0;
+  padding:
+    36px max(24px, calc((100% - 1240px) / 2));
+  border: 0;
+  border-top: 8px solid var(--c-700);
+  border-radius: 0;
+  background: var(--c-900);
+  color: #ffffff;
+  font-size: .9rem;
+}
+.index-page footer.disc p + p {
+  margin-top: 6px;
+}
+@media print, (min-width: 780px) {
+  .index-page .tbl {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #dcdcdc;
+  }
+  .index-page .tbl th, .index-page .tbl td {
+    padding: 16px;
+    border: 0;
+    border-right: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+  }
+  .index-page .tbl th:last-child,
+  .index-page .tbl td:last-child {
+    border-right: 0;
+  }
+  .index-page .tbl tr:last-child td {
+    border-bottom: 0;
+  }
+  .index-page .tbl th {
+    background: var(--c-800);
+    color: #ffffff;
+    font-size: .82rem;
+    font-weight: 700;
+  }
+  .index-page .tbl td:first-child {
+    color: var(--c-900);
+    font-weight: 700;
+  }
+}
+@media (max-width: 1100px) {
+  .intro {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .index-page .kv {
+    max-width: 30em;
+  }
+}
+@media (max-width: 900px) {
+  .layout {
+    display: block;
+    width: 100%;
+  }
+  .title {
+    padding: 36px 24px 20px;
+    border-left: 0;
+  }
+  .local-nav {
+    position: static;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 20px;
+    padding: 0 24px;
+    border-top: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+  }
+  .local-nav a, .local-nav a:first-child {
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    font-size: .82rem;
+  }
+  main {
+    border-left: 0;
+  }
+  .intro {
+    padding: 28px 24px;
+  }
+  .screen-window {
+    margin: 0 24px 48px;
+  }
+  .index-page section {
+    padding: 48px 24px 56px;
+  }
+}
+@media (max-width: 600px) {
+  body {
+    font-size: 15px;
+  }
+  .index-page header .disc {
+    width: calc(100% - 32px);
+  }
+  .title {
+    padding: 28px 16px 16px;
+  }
+  .index-page h1 {
+    font-size: clamp(1.9rem, 8vw, 2.6rem);
+  }
+  .local-nav {
+    gap: 0 16px;
+    padding: 0 16px;
+  }
+  .intro {
+    gap: 20px;
+    padding: 24px 16px;
+  }
+  .index-page .kv {
+    grid-template-columns: 5.6em minmax(0, 1fr);
+  }
+  .index-page .kv dt, .index-page .kv dd {
+    padding: 8px 12px;
+  }
+  .screen-window {
+    margin: 0 16px 40px;
+    padding: 8px;
+  }
+  .index-page section {
+    padding: 40px 16px 44px;
+  }
+  .index-list > li {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    padding: 12px;
+  }
+  .index-list > li > a,
+  .index-page .tbl td a,
+  .index-page section > p > a {
+    display: inline-flex;
+    min-height: 44px;
+    align-items: center;
+  }
+  .index-page .fig figcaption {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .index-page .fig .open {
+    min-height: 44px;
+  }
+}
+@media print {
+  body {
+    font-size: 10.5pt;
+  }
+  .index-page header {
+    border: 0;
+  }
+  .index-page header .disc {
+    width: 100%;
+    padding: 0 0 6pt;
+  }
+  .layout {
+    display: block;
+    width: 100%;
+  }
+  .local-nav {
+    display: none;
+  }
+  .title {
+    padding: 6pt 0 12pt;
+    border: 0;
+  }
+  .index-page h1 {
+    max-width: none;
+    font-size: 24pt;
+  }
+  main {
+    border: 0;
+  }
+  .intro {
+    grid-template-columns:
+      minmax(0, 19em) minmax(0, 1fr);
+    gap: 0 16pt;
+    padding: 0 0 12pt;
+  }
+  .index-lead {
+    font-size: 10.5pt;
+  }
+  .screen-window {
+    margin: 0;
+    padding: 6pt;
+    break-inside: avoid;
+  }
+  .index-page section {
+    padding: 16pt 0 0;
+    border: 0;
+  }
+  .index-page section > * + * {
+    margin-top: 10pt;
+  }
+  .index-page h2 {
+    margin-bottom: 10pt;
+    font-size: 17pt;
+    break-after: avoid;
+  }
+  .index-page h2::before {
+    width: 28pt;
+    height: 4pt;
+    margin-bottom: 6pt;
+  }
+  .index-list > li {
+    gap: 12pt;
+    padding: 7pt 10pt;
+    break-inside: avoid;
+  }
+  .index-page .tbl th, .index-page .tbl td {
+    padding: 7pt 9pt;
+  }
+  .index-page .tbl th {
+    background: #ffffff;
+    color: #222222;
+    border-bottom: 2px solid var(--c-800);
+  }
+  .index-page section ul li + li {
+    margin-top: 6pt;
+  }
+  .index-page footer.disc {
+    margin-top: 18pt;
+    padding: 10pt 0 0;
+    border-top: 2px solid var(--c-900);
+    background: #ffffff;
+    color: #222222;
+  }
+  .index-page a {
+    color: #222222;
+  }
+}
+</style>
+</head>
+<body>
+<div class="page index-page">
+<header>
+<p class="disc">架空の会社の資料です（自主制作）</p>
+</header>
+
+<div class="layout">
+<div class="title">
+<h1><span class="title-line">設備工事会社の</span><span class="title-line">受発注と原価の</span><span class="title-line">画面設計（自主制作）</span></h1>
+</div>
+
+<nav class="local-nav" aria-label="このページの目次">
+<a href="#sanpun">見る順番</a>
+<a href="#ipponmichi">操作の流れ</a>
+<a href="#reigai">例外の場面</a>
+<a href="#michisuji">設計の資料</a>
+<a href="#tsukuri">作り方</a>
+</nav>
+
+<main>
+<div class="intro">
+<dl class="kv">
+<dt>会社名</dt><dd><span class="value-chunk">青嶺設備工業株式会社</span><span class="value-chunk">（架空）</span></dd>
+<dt>基準日</dt><dd>2026-09-08</dd>
+<dt>役割</dt><dd><span class="value-chunk">営業、</span><span class="value-chunk">工事担当、</span><span class="value-chunk">購買、</span><span class="value-chunk">経理の4つ</span></dd>
+<dt>画面</dt><dd>8枚</dd>
+<dt>工事</dt><dd>15件</dd>
+</dl>
+<p class="index-lead">設備工事の会社で、工事ごとの発注、発注検収、請求の確認、労務費の計上、月次の締めを扱う業務画面と、その設計の文書です。会社名、工事名、取引先名は全て架空です。</p>
+</div>
+
+<div class="screen-window">
+<a class="screen-link" href="app.html#/sai?role=keiri"><img src="docs/img/gamen_sai.png" width="1280" height="800" alt="予算と実績の差異の画面"></a>
+</div>
+
+<section>
+<h2 id="sanpun">見る順番</h2>
+<ol class="index-list">
+<li><a href="app.html#/kouji?role=keiri&reset=1">業務画面を経理として開く</a>
+<p>工事15件の一覧が開き、メニューから請求の確認や月次の締めへ移れます。</p></li>
+<li><a href="#reigai">例外の場面から1つを開く</a>
+<p>予算の超過や二重の請求を画面がどう止め、誰がどう直すかを、1画面で確かめられます。</p></li>
+<li><a href="docs/04_gamen_ichiran.html">画面の一覧と遷移を開く</a>
+<p>8画面の役割と行き来、役割ごとの権限、状態の変わり方を1つの文書にまとめています。</p></li>
+<li><a href="docs/07_dougu.html">道具とスプレッドシート版を開く</a>
+<p>サンプルデータを作って検査する Python の道具と、スプレッドシート版の例を説明しています。</p></li>
+<li><a href="#kotowari">断り3行を読む</a>
+<p>自主制作であることと、実在する企業の業務、データ、資料を使っていないことを書いています。</p></li>
+</ol>
+<p>時間があれば、続けて<a href="#ipponmichi">操作の流れ</a>を試してください。</p>
+</section>
+
+<section>
+<h2 id="ipponmichi">操作の流れ</h2>
+<figure class="fig">
+<img src="docs/img/ipponmichi.svg" width="960" height="360" alt="工事担当が予算を超える発注を起票し、購買が承認し、工事担当が一部を発注検収し、経理が請求を差し戻してから修正版を再受付して確認し、8月を締めるまでの6段と、各段で切り替える役割と確かめることを並べた図。">
+<figcaption><span>操作の流れの6段</span><a class="open" href="docs/img/ipponmichi.svg">図だけを開く</a></figcaption>
+</figure>
+<p>流れを確かめる工事は 26-011 空調機更新（2・3階）で、費目は外注費です。予算を超える発注から8月の締めまでを、役割を切り替えながら操作します。各段のリンクは、その段の役割と画面で開きます。</p>
+<ol class="index-list">
+<li><a href="app.html#/hacchu/new?kouji=26-011&role=tanto&reset=1">工事担当で発注の登録を開く</a>
+<p>外注費で予算の残りを超える額を入れると、理由の欄が出て必須になります。理由を入れて起票すると、承認のボタンが押せず「承認は購買のみ」と出ます。</p></li>
+<li><a href="app.html#/kouji/26-011?role=kobai">購買に切り替えて工事詳細を開く</a>
+<p>発注の一覧から起票した発注を開き、承認します。発注日に承認した日が入り、承認後は金額を変えられなくなります。</p></li>
+<li><a href="app.html#/kenshu?role=tanto">工事担当に戻して発注検収の登録を開く</a>
+<p>この発注を選び、出来高として一部の額を登録します。未検収残を超える額は止まります。</p></li>
+<li><a href="app.html#/seikyu?role=keiri">経理に切り替えて請求の確認を開く</a>
+<p>この発注の請求書を、検収した額より多い額で受け付けます。判定が「検収額を超えている」になって確認のボタンが押せないので、理由を入れて差し戻します。</p></li>
+<li><a href="app.html#/seikyu?role=keiri">経理のまま請求の確認で修正版を受け付ける</a>
+<p>差戻しの行から修正版を再受付すると、判定が「確定できる」になり、計上月を選んで確認します。発注の詳細の履歴で、差戻し、再受付、確認がつながって見えます。</p></li>
+<li><a href="app.html#/shime/2026-08?role=keiri">月次の締めで8月を開く</a>
+<p>止めている項目が行へのリンク付きで並ぶので、労務費を計上し、請求を判定どおりに片付けてから締めます。締めた後は、8月の日付で発注検収を登録できず、請求の計上月に8月を選べません。</p></li>
+</ol>
+<p>途中の変更は、このブラウザのタブの中で持ち回ります。最初からやり直すときは、1段目のリンクを開きます。</p>
+</section>
+
+<section>
+<h2 id="reigai">例外の場面</h2>
+<p>どの場面も、画面がどう止め、どう直すかが1画面で分かる状態で開きます。場面のリンクは最初の状態で開くので、操作の流れの途中の変更は消えます。</p>
+<table class="tbl stack wide">
+<thead><tr><th class="w10">場面</th><th>画面の止め方</th><th>直し方</th></tr></thead>
+<tbody>
+<tr>
+<td class="ph" data-label="場面"><a href="app.html#/kouji/26-005?role=keiri&reset=1">
+予算を超えている工事</a></td>
+<td class="ph" data-label="止め方">発注の起票と承認のときに超過を判定し、理由が無ければ先へ進めません。</td>
+<td class="ph" data-label="直し方">工事担当が超過の理由を書いて起票し、購買が承認します。予算を直すべきときは、工事担当が予算改定を起案し、営業が承認します。</td>
+</tr>
+<tr>
+<td class="ph" data-label="場面"><a href="app.html#/kenshu?hacchu=26-007-03&date=2026-07-15&role=tanto&reset=1">
+締めた月に入力しようとした</a></td>
+<td class="ph" data-label="止め方">締め済の月の日付を入れると、日付の欄の下に理由が出て登録できません。</td>
+<td class="ph" data-label="直し方">入力した人が、日付を未締めの月にして登録します。締め済の月の発注検収を直すときは、当月の日付で訂正（マイナス額）を登録します。</td>
+</tr>
+<tr>
+<td class="ph" data-label="場面"><a href="app.html#/seikyu?focus=R-0106&role=keiri&reset=1">
+同じ発注に請求が2本</a></td>
+<td class="ph" data-label="止め方">判定が「二重の疑い」になり、確認のボタンが押せず理由が出ます。</td>
+<td class="ph" data-label="直し方">経理が2本を請求書の現物と照らして正本を決め、正本でない方を理由を付けて取り消してから、正本を確認します。</td>
+</tr>
+<tr>
+<td class="ph" data-label="場面"><a href="app.html#/seikyu?focus=R-0111&role=keiri&reset=1">
+検収していないのに請求</a></td>
+<td class="ph" data-label="止め方">判定が「発注検収なし」になり、確認のボタンが押せず理由が出ます。</td>
+<td class="ph" data-label="直し方">納品が済んでいれば工事担当か購買が発注検収を登録し、経理が確認します。済んでいなければ、経理が差し戻します。</td>
+</tr>
+</tbody>
+</table>
+</section>
+
+<section>
+<h2 id="michisuji">設計の資料</h2>
+<p>聞き取りのメモから画面ごとの意図まで、材料が画面になるまでの順に並べています。</p>
+<ol class="index-list">
+<li><a href="docs/01_kikitori.html">聞き取りのメモ</a>
+<p>受発注から月末の締めまでのやり方と困っていることを、役割ごとの発言で記録しています。</p></li>
+<li><a href="docs/02_chohyo.html">帳票のサンプル</a>
+<p>今の業務で使っている紙の発注書と、表計算で作る工事別の原価表です。</p></li>
+<li><a href="docs/03_gyomu_seiri.html">業務整理</a>
+<p>誰がいつ何を入力して何が出るかと、資料から決められることと確認が要ることを1枚に整理しています。</p></li>
+<li><a href="docs/04_gamen_ichiran.html">画面の一覧と遷移</a>
+<p>8画面の役割と行き来、役割ごとの権限、状態遷移の表です。</p></li>
+<li><a href="docs/05_koumoku.html">項目の定義</a>
+<p>画面で扱う項目を、サンプルデータと同じ定義から表にしています。</p></li>
+<li><a href="app.html">業務画面</a>
+<p>8画面を1ページで切り替え、役割を変えながら操作できます。</p></li>
+<li><a href="docs/06_gamen_ito.html">画面ごとの意図</a>
+<p>画面ごとに、誰がどの業務で使うか、どこにこだわったか、採らなかった作りとその理由を書いています。</p></li>
+</ol>
+</section>
+
+<section>
+<h2 id="tsukuri">作り方</h2>
+<p>設計から実装、検証まで AI（Claude Code）を使って進め、サンプルデータの生成と整合の検査は Python の道具で行いました。</p>
+<ul>
+<li>tools の make_data.py がサンプルデータを作り、check_rules.py が金額、状態、締めの期間、履歴の対応、場面を検査し（--words で公開禁止語も調べ）、make_xlsx.py が原価表の xlsx を出します。</li>
+<li>tools/sheet/Code.gs は、締め済の月に入る編集を止め、予算超過を一覧にするスプレッドシート版の例です。</li>
+</ul>
+<p><a href="docs/07_dougu.html">道具とスプレッドシート版の文書を開く</a></p>
+</section>
+</main>
+</div>
+
+<footer class="disc" id="kotowari">
+<p>公開されている情報と一般的な商慣行をもとにした自主制作です。</p>
+<p>実在する企業の業務、データ、資料は使っていません。</p>
+<p>確認が要る事柄は、決めつけずに分けてあります。</p>
+</footer>
+</div>
+</body>
+</html>

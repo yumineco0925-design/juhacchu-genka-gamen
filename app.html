@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>工事原価管理</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="side-inner">
+      <div class="side-head">
+        <div>
+          <div class="sys">工事原価管理</div>
+          <div class="side-meta"><span id="company"></span><span id="base-date"></span></div>
+        </div>
+        <button type="button" class="menu-btn" aria-controls="nav">メニュー</button>
+      </div>
+      <nav class="nav" id="nav" aria-label="メニュー">
+        <a href="#/kouji" data-menu="kouji">工事一覧</a>
+        <a href="#/kenshu" data-menu="kenshu">発注検収</a>
+        <a href="#/seikyu" data-menu="seikyu">請求の確認</a>
+        <a href="#/sai" data-menu="sai">予算と実績の差異</a>
+        <a href="#/torihikisaki" data-menu="torihikisaki">取引先</a>
+        <a href="#/shime" data-menu="shime">月次の締め</a>
+      </nav>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <p class="viewas" id="viewas"></p>
+      <div class="role">
+        <span class="role-label" id="role-label">役割</span>
+        <div class="seg" id="role-seg" role="group" aria-labelledby="role-label"></div>
+      </div>
+    </header>
+    <main class="content" id="content" tabindex="-1"></main>
+  </div>
+</div>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+<script src="assets/screens/kouji_list.js"></script>
+<script src="assets/screens/kouji_detail.js"></script>
+<script src="assets/screens/hacchu.js"></script>
+<script src="assets/screens/kenshu.js"></script>
+<script src="assets/screens/seikyu.js"></script>
+<script src="assets/screens/sai.js"></script>
+<script src="assets/screens/torihikisaki.js"></script>
+<script src="assets/screens/shime.js"></script>
+<script>App.start();</script>
+</body>
+</html>

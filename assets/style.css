@@ -1,0 +1,1728 @@
+/* 共通の見た目
+   有彩色は藍の1系統、無彩色は6値。色と寸法は :root の変数だけを使う。 */
+
+:root {
+  /* 藍 */
+  --c-900: #0e2645; /* 超過の札、横棒の超過部分、超過した値、差異の最も濃い段 */
+  --c-800: #15345e; /* 主なボタンにポインターを重ねたとき */
+  --c-700: #1d4478; /* 現在地、選択中、主なボタン、リンク、フォーカスの枠、焦点の行の線 */
+  --c-500: #4a74ad; /* 差異の濃淡 4段目 */
+  --c-300: #a9c0de; /* 知らせ枠の線、差異の濃淡 3段目 */
+  --c-100: #d6e2f1; /* 差異の濃淡 2段目 */
+  --c-50:  #eef3f9; /* 知らせ枠の地、超過の行、選択中の絞り込み、差異の濃淡 1段目 */
+
+  /* 無彩色 */
+  --bg: #f3f3f3;
+  --surface: #ffffff;
+  --line: #dcdcdc;
+  --ink: #222222;
+  --ink-2: #4d4d4d;
+  --ink-3: #757575;
+
+  --font: system-ui, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+  --fs: 14px;
+  --fs-s: 13px;
+  --fs-xs: 12px;
+  --fs-h1: 20px;
+  --fs-h2: 16px;
+  --lh: 1.65;
+
+  --r: 3px;
+  --head: 36px;   /* 表の見出しの高さ */
+  --row: 40px;    /* 表の行の高さ */
+  --ctl: 36px;    /* ボタンと入力欄の高さ */
+  --tap: 44px;    /* 幅640以下で押せる高さ */
+  --side: 184px;
+  --gut: 24px;
+  --bar-w: 96px;
+  --bar-h: 8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* 送った先が下の固定の帯（幅640以下）に隠れないようにする。上に固定の帯は無い */
+html { -webkit-text-size-adjust: 100%; scroll-padding-bottom: calc(var(--fixbar-h, 0px) + 8px); }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: var(--fs);
+  line-height: var(--lh);
+  font-variant-numeric: tabular-nums;
+}
+
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; }
+ol, ul { padding: 0; }
+
+button, input, select, textarea { font: inherit; color: inherit; }
+
+a { color: var(--c-700); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+:focus-visible { outline: 2px solid var(--c-700); outline-offset: 2px; }
+.content:focus, h1:focus { outline: none; }
+
+.vh {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+.nw { white-space: nowrap; }
+.num { text-align: right; white-space: nowrap; }
+.muted { color: var(--ink-2); }
+.small { font-size: var(--fs-s); }
+[hidden] { display: none !important; }
+
+/* ---------- 外枠 ---------- */
+
+.app {
+  display: grid;
+  grid-template-columns: var(--side) minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.side { background: var(--surface); border-right: 1px solid var(--line); }
+
+.side-inner {
+  position: sticky; top: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+
+.side-head {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sys { font-size: 15px; font-weight: 600; }
+.side-meta { font-size: var(--fs-xs); color: var(--ink-2); line-height: 1.5; margin-top: 2px; }
+.side-meta span { display: block; }
+
+.menu-btn { display: none; }
+
+.nav { display: flex; flex-direction: column; padding: 8px 0; }
+.nav a {
+  display: flex; align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.nav a:hover { background: var(--bg); text-decoration: none; }
+.nav a[aria-current="page"] { background: var(--c-700); color: var(--surface); }
+.nav a:focus-visible { outline-offset: -2px; }
+.nav a[aria-current="page"]:focus-visible { outline-color: var(--ink); }
+
+.main { min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  min-height: 48px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  padding: 6px var(--gut);
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.viewas { font-size: var(--fs-s); }
+/* 上の帯が狭い間は役割の説明に2行分の高さを取り、役割を切り替えても帯の高さを変えない */
+@media (min-width: 641px) {
+  .topbar { container: topbar / inline-size; }
+}
+@container topbar (max-width: 819px) {
+  .viewas { min-height: 2lh; align-content: center; }
+}
+
+.role { display: flex; align-items: center; gap: 8px; flex: none; }
+.role-label { font-size: var(--fs-s); color: var(--ink-2); }
+
+/* 切り替え: 選択中は藍の塗りに白文字 */
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+.seg button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-left: 1px solid var(--ink-3);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-s);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.seg button:first-child { border-left: 0; border-radius: var(--r) 0 0 var(--r); }
+.seg button:last-child { border-radius: 0 var(--r) var(--r) 0; }
+.seg button:hover { background: var(--bg); }
+.seg button[aria-pressed="true"] { background: var(--c-700); color: var(--surface); }
+.seg button:focus-visible { outline-offset: 1px; position: relative; }
+
+.content { padding: 20px var(--gut) 48px; min-width: 0; }
+
+/* ---------- 画面の頭 ---------- */
+
+.page-head {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 12px 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.page-title { min-width: 0; }
+.title-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+h1 { font-size: var(--fs-h1); font-weight: 600; line-height: 1.4; }
+.rec-no { color: var(--ink-2); white-space: nowrap; }
+.title-line .tag { align-self: center; }
+
+.crumbs { margin-bottom: 2px; }
+.crumbs ol { display: flex; flex-wrap: wrap; list-style: none; font-size: var(--fs-s); color: var(--ink-2); }
+.crumbs li + li::before { content: "/"; margin: 0 6px; color: var(--ink-3); }
+
+.back { margin-top: 8px; font-size: var(--fs-s); }
+/* 戻るリンクのある頭: 幅641以上では、操作を見出しの行の中ほどにそろえ、戻るリンクは見出しの下に置く */
+@media screen and (min-width: 641px) {
+  .page-head-back { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr; align-items: start; gap: 0 16px; }
+  .page-head-back > .page-title { display: contents; }
+  .page-head-back .crumbs { grid-column: 1 / -1; grid-row: 1; }
+  .page-head-back .title-line { grid-column: 1; grid-row: 2; }
+  .page-head-back .back { grid-column: 1; grid-row: 3; }
+  .page-head-back > .actionbar { grid-column: 2; grid-row: 2 / span 2; margin-top: calc((var(--fs-h1) * 1.4 - var(--ctl)) / 2); }
+}
+
+/* 主な操作: 見出しの行の右端。幅640以下では押せる主な操作を下の固定の帯（.fixbar）に移し、残りは見出しの下に並べる */
+.actionbar { display: flex; align-items: flex-start; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+.actionbar .act { align-items: flex-end; text-align: right; }
+/* 幅641以上では押せない理由をボタンの左に1行で並べ、見出しの帯の高さを理由の有無で変えない。
+   見出しの横に入らない幅では操作の帯ごと次の行の右端に置く。戻るリンクのある頭は除き、理由をボタンの下に置く */
+@media (min-width: 641px) {
+  .page-head:not(.page-head-back) .act { flex-direction: row-reverse; align-items: center; gap: 12px; }
+  .page-head:not(.page-head-back) .act .reason { white-space: nowrap; }
+  .page-head:not(.page-head-back) > .actionbar { margin-left: auto; }
+}
+.fixbar { display: none; }
+
+/* 保存の後の1行の知らせ */
+.flash {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+}
+.flash a { white-space: nowrap; }
+
+/* 操作の並び: 左に副の操作、線で離して戻す・取消、右端に主な操作 */
+.toolbar { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 12px 16px; margin-bottom: 16px; }
+.toolbar:last-child { margin-bottom: 0; }
+.toolbar-left, .toolbar-danger, .toolbar-right { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+.toolbar-left + .toolbar-danger { padding-left: 16px; border-left: 1px solid var(--line); }
+.toolbar-right { margin-left: auto; }
+
+/* ---------- 面 ---------- */
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  margin-bottom: 16px;
+  min-width: 0;
+}
+/* 右の操作が見出しより高くなっても、見出しの文字を最初のボタンの文字の高さにそろえる。1段のときは帯の高さの中央に置く */
+.panel-head {
+  min-height: 48px;
+  display: flex; align-items: baseline; align-content: center; justify-content: space-between; gap: 8px 12px;
+  flex-wrap: wrap;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.panel-head h2 { font-size: var(--fs-h2); font-weight: 600; }
+.panel-body { padding: 16px; }
+.panel-foot {
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-s);
+  color: var(--ink-2);
+}
+.tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+
+.filters {
+  display: flex; align-items: flex-end; flex-wrap: wrap; gap: 12px 16px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.filters .grow { flex: 1 1 220px; }
+.filters-end { margin-left: auto; display: flex; align-items: flex-end; flex-wrap: wrap; gap: 8px 16px; }
+
+.bar-line {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* ---------- 表 ---------- */
+
+/* パネルの外に置いた表は、表のまとまりを面にする。角は clip で切る（hidden と違い見出しの sticky を壊さない） */
+.tbl-block {
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  overflow: clip;
+  margin-bottom: 16px;
+}
+.tbl-block:last-child { margin-bottom: 0; }
+/* 検索の帯のすぐ下では、帯の下の線を面の上の線にする */
+.filters + .tbl-block { border-top: 0; border-radius: 0 0 var(--r) var(--r); }
+/* パネルの中では面と線と角丸をパネルに任せる */
+.panel .tbl-block { background: none; border: 0; border-radius: 0; overflow: visible; margin-bottom: 0; }
+.tbl-count { padding: 8px 16px; font-size: var(--fs-s); color: var(--ink-2); border-bottom: 1px solid var(--line); }
+.tbl-wrap { min-width: 0; }
+
+.tbl {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* 見出しは1行で、下へ送っても上に残る */
+.tbl th {
+  position: sticky; top: 0; z-index: 1;
+  height: var(--head);
+  padding: 0 10px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: var(--fs-s);
+  font-weight: 400;
+  text-align: left;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+/* 見出しが画面の上に残る幅（641〜1100 は表の内側で横に送るので残らない）では、Tab で戻った先が見出しの下に隠れないよう上を空ける。
+   見出しは一番高い物で 44px、それに 8px を足す */
+@media (min-width: 1101px) {
+  html { scroll-padding-top: 52px; }
+}
+.tbl td {
+  height: var(--row);
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.tbl th:first-child, .tbl td:first-child { padding-left: 16px; }
+.tbl th:last-child, .tbl td:last-child { padding-right: 16px; }
+.tbl th.num, .tbl td.num { text-align: right; white-space: nowrap; }
+.tbl td.nw { white-space: nowrap; }
+.tbl tbody tr:last-child td { border-bottom: 0; }
+
+/* 行全体を押せる表。行の番号のリンクにフォーカスが来る */
+.tbl tr.is-link { cursor: pointer; }
+.tbl tr.is-link:hover td, .tbl tr.is-link:focus-within td { background: var(--bg); }
+.row-link { white-space: nowrap; }
+button.row-link {
+  padding: 0; border: 0; background: none;
+  color: var(--c-700); font: inherit; text-align: left; cursor: pointer;
+}
+button.row-link:hover { text-decoration: underline; text-underline-offset: 2px; }
+
+.tbl tr.is-over td, .tbl tr.is-over:hover td, .tbl tr.is-over:focus-within td { background: var(--c-50); }
+.tbl tr.is-focus td:first-child { border-left: 3px solid var(--c-700); padding-left: 13px; }
+
+/* 取消の行: 元の値を薄い文字で残す */
+.tbl tr.is-void td { color: var(--ink-3); }
+.tbl tr.is-void .tag { color: var(--ink-3); border-color: var(--line); }
+.tbl tr.is-void a { color: var(--ink-3); }
+
+.tbl tfoot td {
+  height: var(--row);
+  border-top: 1px solid var(--ink-3);
+  border-bottom: 0;
+  background: var(--surface);
+  font-weight: 600;
+}
+.tbl tfoot tr.is-over td { background: var(--c-50); }
+
+.tbl-note {
+  padding: 8px 16px 12px;
+  border-top: 1px solid var(--line);
+  font-size: var(--fs-s);
+  color: var(--ink-2);
+}
+
+.over-val { color: var(--c-900); font-weight: 600; }
+
+.empty { padding: 24px 16px; color: var(--ink-2); }
+.empty p { margin-bottom: 10px; }
+.empty p:last-child { margin-bottom: 0; }
+
+.sub-line { display: block; font-size: var(--fs-xs); color: var(--ink-2); white-space: nowrap; font-weight: 400; }
+.val-stack { display: inline-flex; flex-direction: column; align-items: flex-end; }
+
+/* ---------- 状態の札 ---------- */
+
+.tag {
+  display: inline-flex; align-items: center;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink-2);
+  font-size: var(--fs-xs);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.tag-over { background: var(--c-900); border-color: var(--c-900); color: var(--surface); }
+.tags { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+
+/* ---------- 消化率と横棒 ---------- */
+
+.rate {
+  display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px;
+  vertical-align: middle;
+}
+.rate-top { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+
+/* 横棒は 0〜125%。縦線は 100% の位置（左から 80%） */
+.bar {
+  position: relative;
+  display: block;
+  width: var(--bar-w);
+  min-width: 96px;
+  height: var(--bar-h);
+  background: var(--bg);
+  border: 1px solid var(--line);
+}
+.bar-fill { position: absolute; top: 0; bottom: 0; left: 0; background: var(--ink-3); }
+.bar-over { position: absolute; top: 0; bottom: 0; left: 80%; min-width: 6px; background: var(--c-900); }
+.bar::after {
+  content: "";
+  position: absolute; top: -4px; bottom: -4px; left: 80%;
+  width: 1px;
+  background: var(--ink);
+}
+.bar-none { border-style: dashed; }
+
+/* ---------- 状態の段 ---------- */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 4px;
+  list-style: none;
+}
+.steps li {
+  padding-top: 6px;
+  border-top: 3px solid var(--line);
+  font-size: var(--fs-s);
+  color: var(--ink-3);
+  line-height: 1.4;
+}
+.steps li.is-done { border-top-color: var(--ink-3); color: var(--ink-2); }
+.steps li[aria-current="step"] { border-top-color: var(--c-700); color: var(--ink); font-weight: 600; }
+.step-date { display: block; margin-top: 2px; font-size: var(--fs-xs); font-weight: 400; color: var(--ink-2); white-space: nowrap; }
+
+/* ---------- ボタン ---------- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: var(--ctl);
+  padding: 0 14px;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs);
+  line-height: 1.3;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg); text-decoration: none; }
+.btn-primary { background: var(--c-700); border-color: var(--c-700); color: var(--surface); }
+.btn-primary:hover { background: var(--c-800); border-color: var(--c-800); }
+.btn:disabled, .btn:disabled:hover {
+  background: var(--bg);
+  border-color: var(--line);
+  color: var(--ink-3);
+  cursor: not-allowed;
+}
+.btn-s { min-height: 28px; padding: 0 10px; font-size: var(--fs-s); }
+
+/* ボタンと押せない理由（理由はボタンの直下） */
+.act { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 4px; max-width: 100%; }
+.act-side { flex-direction: row; align-items: center; gap: 8px; flex-wrap: wrap; }
+.reason { font-size: var(--fs-s); color: var(--ink-2); line-height: 1.5; }
+.reason-line { display: block; }
+
+.actions { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+
+/* 主でない操作の並び（App.opList）: 左にボタン（幅を揃える）、右に理由。danger の物は線の下 */
+.oplist {
+  list-style: none;
+  display: grid; grid-template-columns: max-content minmax(0, 1fr);
+  gap: 8px 16px;
+  align-items: center;
+}
+.oplist-row { display: grid; grid-column: 1 / -1; grid-template-columns: subgrid; row-gap: 4px; align-items: center; }
+.oplist-row .act { display: contents; }
+.oplist-row .btn { grid-column: 1; justify-self: stretch; }
+.oplist-row .reason { grid-column: 2; }
+.oplist-row.is-danger-first { padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* ---------- 入力欄と誤り ---------- */
+
+.field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.field-label { font-size: var(--fs-s); color: var(--ink-2); }
+.field-label .req { margin-left: 6px; font-size: var(--fs-xs); }
+.hint { font-size: var(--fs-xs); color: var(--ink-2); }
+
+.input, .select, .textarea {
+  width: 100%;
+  min-height: var(--ctl);
+  padding: 0 10px;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs);
+}
+.textarea { padding: 8px 10px; min-height: 72px; line-height: 1.6; resize: vertical; }
+.input.num { text-align: right; }
+/* 検索欄の消すボタン: 文字の高さの藍の×。押せる範囲は×の周りまで広げる */
+.input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: none; appearance: none;
+  width: 28px; height: 28px; margin: 0 -6px 0 4px;
+  background-color: var(--c-700);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 2.5l11 11M13.5 2.5l-11 11' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 1em 1em no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2.5 2.5l11 11M13.5 2.5l-11 11' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / 1em 1em no-repeat;
+  cursor: pointer;
+}
+.input[type="search"]::-webkit-search-cancel-button:hover { background-color: var(--c-800); }
+.input:disabled, .select:disabled, .textarea:disabled, .input[readonly] {
+  background: var(--bg); border-color: var(--line); color: var(--ink-2);
+}
+
+/* 単位は欄の右に固定で出す */
+.input-wrap {
+  display: flex; align-items: stretch;
+  width: 100%;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+}
+.input-wrap .input { border: 0; min-width: 0; flex: 1 1 auto; background: transparent; }
+.input-wrap .input:focus-visible { outline: none; }
+.input-wrap:focus-within { outline: 2px solid var(--c-700); outline-offset: 2px; }
+.input-wrap.is-disabled { background: var(--bg); border-color: var(--line); }
+.unit { display: flex; align-items: center; padding: 0 10px 0 2px; color: var(--ink-2); font-size: var(--fs-s); white-space: nowrap; }
+
+/* 誤り: 色を使わず、太い濃い枠と欄の直下の文言 */
+.field.is-err .input, .field.is-err .select, .field.is-err .textarea { border: 2px solid var(--ink); padding-left: 9px; }
+.field.is-err .textarea { padding-top: 7px; }
+.field.is-err .input-wrap { border: 2px solid var(--ink); }
+.field.is-err .input-wrap .input { border: 0; padding-left: 9px; }
+.err { font-size: var(--fs-s); color: var(--ink); line-height: 1.5; }
+
+.check { display: inline-flex; align-items: center; gap: 6px; min-height: var(--ctl); cursor: pointer; white-space: nowrap; }
+.check input { width: 16px; height: 16px; margin: 0; accent-color: var(--c-700); }
+
+.form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+.form .span-2 { grid-column: 1 / -1; }
+.form-actions { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+/* ---------- 絞り込みの札 ---------- */
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-s);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chip:hover { background: var(--bg); }
+.chip .count { margin-left: 6px; color: var(--ink-2); }
+.chip[aria-pressed="true"] { border-color: var(--c-700); background: var(--c-50); color: var(--c-700); }
+.chip[aria-pressed="true"] .count { color: var(--c-700); }
+
+/* ---------- 知らせ枠 ---------- */
+
+/* 超過の知らせ: 薄い藍の地に濃い文字。左の太線は付けない */
+.notice {
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: var(--c-50);
+  border: 1px solid var(--c-300);
+  border-radius: var(--r);
+}
+.notice-title { font-size: 15px; font-weight: 600; color: var(--c-900); line-height: 1.5; }
+.notice p { margin-top: 4px; }
+.notice-fix-label { color: var(--ink-2); margin-right: 8px; }
+
+/* 直し方だけの枠: 無彩色の線で囲む */
+.notice-plain { background: var(--surface); border-color: var(--ink-3); }
+.notice-plain .notice-title { color: var(--ink); }
+
+/* ---------- 項目の並び ---------- */
+
+.info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px 24px;
+}
+.info dt { font-size: var(--fs-xs); color: var(--ink-2); }
+.info dd { margin: 0; overflow-wrap: anywhere; }
+.info .num dt, .info .num dd { text-align: right; }
+
+.sums {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+.sum { padding: 10px 16px; border-right: 1px solid var(--line); text-align: right; }
+.sum:last-child { border-right: 0; }
+.sum dt { font-size: var(--fs-xs); color: var(--ink-2); }
+.sum dd { margin: 0; font-size: 16px; white-space: nowrap; }
+
+.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 16px; }
+.kv dt { color: var(--ink-2); font-size: var(--fs-s); }
+.kv dd { margin: 0; }
+.kv dd.num { text-align: right; }
+
+/* ---------- 履歴 ---------- */
+
+.log { list-style: none; }
+.log li {
+  display: grid;
+  grid-template-columns: 136px 150px minmax(0, 1fr);
+  gap: 2px 16px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.log li:last-child { border-bottom: 0; }
+.log-time { white-space: nowrap; color: var(--ink-2); }
+.log-who { color: var(--ink-2); }
+.log-detail, .log-reason { grid-column: 3; font-size: var(--fs-s); color: var(--ink-2); overflow-wrap: anywhere; }
+/* 新しい10件より前の行は「前の履歴を表示」を押すまで出さない */
+.log li.is-old { display: none; }
+.log-more { padding: 12px 16px; }
+
+/* ---------- 差異の濃淡（予算と実績の差異の消化率のセルだけ） ---------- */
+
+.heat-1 { background: var(--c-50); }
+.heat-2 { background: var(--c-100); }
+.heat-3 { background: var(--c-300); }
+.heat-4 { background: var(--c-500); color: var(--surface); }
+.heat-5 { background: var(--c-900); color: var(--surface); }
+/* 行に重ねる背景より消化率の濃淡を優先する（濃い段の白い文字が消えないように） */
+.tbl tr.is-link:hover td.heat-1, .tbl tr.is-link:focus-within td.heat-1 { background: var(--c-50); }
+.tbl tr.is-link:hover td.heat-2, .tbl tr.is-link:focus-within td.heat-2 { background: var(--c-100); }
+.tbl tr.is-link:hover td.heat-3, .tbl tr.is-link:focus-within td.heat-3 { background: var(--c-300); }
+.tbl tr.is-link:hover td.heat-4, .tbl tr.is-link:focus-within td.heat-4 { background: var(--c-500); color: var(--surface); }
+.tbl tr.is-link:hover td.heat-5, .tbl tr.is-link:focus-within td.heat-5 { background: var(--c-900); color: var(--surface); }
+
+/* ---------- ダイアログ ---------- */
+
+.dlg-back {
+  position: fixed; inset: 0;
+  z-index: 50;
+  background: var(--ink);
+  opacity: 0.4;
+}
+.dlg {
+  position: fixed; top: 50%; left: 50%;
+  z-index: 51;
+  transform: translate(-50%, -50%);
+  width: min(520px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+}
+.dlg-title { font-size: var(--fs-h2); font-weight: 600; margin-bottom: 8px; }
+.dlg-body > * + * { margin-top: 12px; }
+.dlg-body .form { grid-template-columns: minmax(0, 1fr); }
+.dlg-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+
+/* ---------- 幅 641〜1100: 表が入り切らないときは表の内側で送る ---------- */
+
+@media (min-width: 641px) and (max-width: 1100px) {
+  .tbl-wrap { overflow-x: auto; }
+}
+
+/* ---------- 幅 900 以下: 左メニューを上の帯に ---------- */
+
+@media (max-width: 900px) {
+  :root { --gut: 16px; }
+  .app { display: block; }
+  .side { border-right: 0; border-bottom: 1px solid var(--line); }
+  .side-inner { position: static; max-height: none; overflow: visible; }
+  .side-head { align-items: center; padding: 8px 16px; border-bottom: 0; }
+  .side-meta span { display: inline; margin-right: 8px; }
+  .menu-btn { display: inline-flex; flex: none; }
+  .nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 0 8px;
+    border-top: 1px solid var(--line);
+  }
+  .nav:not(.is-open) { display: none; }
+  .nav a { min-height: var(--tap); }
+}
+
+/* ---------- 幅 640 以下（375 を含む） ---------- */
+
+@media (max-width: 640px) {
+  .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* 役割の切り替えは幅いっぱいの1行 */
+  .topbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px 16px; }
+  .role { width: 100%; }
+  .role-label { display: none; }
+  .seg { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
+  .seg button { min-height: var(--tap); padding: 0 4px; }
+
+  .content { padding: 16px 16px 40px; }
+  .page-head { flex-direction: column; align-items: stretch; }
+
+  /* パンくず、戻る、履歴のリンクは高さ44px。増えた高さは上下の余白で詰める */
+  .crumbs a, .back a, .log a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .tbl-cards .k-head a, .tbl-cards .k-title a, .tbl-cards .k-row a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  /* 知らせのリンクは中の番号と後ろの文の間の空白を残すため inline-block にし、上下の余白で高さを取る */
+  .notice a, .flash a { display: inline-block; min-height: var(--tap); padding: calc((var(--tap) - 1lh) / 2) 0; }
+  /* 知らせの文、直す道、「次: 」はそれぞれ新しい行から始め、リンクはその間の行に置く。幅の違う枠でも同じ並びになる */
+  .flash > span { flex-basis: 100%; }
+  /* 最後がリンクの行なら、リンクの下の余白の分だけ知らせの下の余白を減らし、上と下の空きをそろえる */
+  .flash:has(> a:last-child) { padding-bottom: max(0px, calc(10px - (var(--tap) - 1lh) / 2)); }
+  .crumbs { margin: -12px 0 0; }
+  .crumbs ol { align-items: center; }
+  /* 2段以上のパンくずの最後の段（今の画面）は見出しと同じ文なので、読み上げだけに残す。前の段の後ろの区切りも出さない */
+  .crumbs li[aria-current="page"]:not(:first-child) {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  }
+  .crumbs li:has(+ li[aria-current="page"]:not(:first-child))::after { content: none; }
+  .back { margin: -4px 0 -12px; }
+
+  /* 見出しの右の操作は見出しの下に並べる。押せる主な操作は下の固定の帯に移る */
+  .actionbar { flex-direction: column; align-items: stretch; justify-content: flex-start; }
+  .actionbar .act { align-items: flex-start; text-align: left; }
+  .actionbar:empty { display: none; }
+  /* 下の固定の帯: 押せる主な操作だけを1段で置く。本文の下に帯の高さ（--fixbar-h）の余白を取る */
+  .fixbar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: flex; gap: 8px;
+    padding: 8px 16px calc(8px + env(safe-area-inset-bottom, 0px));
+    background: var(--surface);
+    border-top: 1px solid var(--ink-3);
+  }
+  .fixbar > * { flex: 1 1 0; min-width: 0; }
+  .fixbar .act { width: 100%; align-items: stretch; }
+  .fixbar .btn { width: 100%; white-space: normal; }
+  body.has-fixbar .content { padding-bottom: calc(var(--fixbar-h, 61px) + 16px); }
+
+  .toolbar { flex-direction: column; align-items: stretch; }
+  .toolbar-right { margin-left: 0; }
+  .toolbar-left + .toolbar-danger { padding-left: 0; border-left: 0; padding-top: 12px; border-top: 1px solid var(--line); }
+
+  .btn { min-height: var(--tap); }
+  .btn-s { min-height: var(--tap); }
+  .oplist { grid-template-columns: minmax(0, 1fr); }
+  .oplist-row .reason { grid-column: 1; }
+  .oplist-row .btn { white-space: normal; }
+  .input, .select { min-height: var(--tap); }
+  .input[type="search"]::-webkit-search-cancel-button { width: 40px; height: 40px; margin-right: -10px; }
+  .chip { min-height: var(--tap); }
+  .check { min-height: var(--tap); }
+
+  .filters { flex-direction: column; align-items: stretch; }
+  .filters .grow { flex: 0 0 auto; } /* 縦に積むと基準の 220px が高さに効くので外す */
+  .filters-end { margin-left: 0; }
+
+  .info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form { grid-template-columns: minmax(0, 1fr); }
+  .steps { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 10px; }
+  .sums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sum { border-bottom: 1px solid var(--line); }
+  .sum:nth-child(2n) { border-right: 0; }
+
+  .log li { grid-template-columns: minmax(0, 1fr); }
+  .log a { margin: -10px 0; } /* 44px のうち上下10pxは前後の行に重ねる */
+  .log-reason { grid-column: 1; margin-top: 8px; }
+  /* 日時、人、内容、明細の順に縦に積む */
+  .log-who, .log-detail { grid-column: 1; }
+
+  /* 表をカードに組み替える。横スクロールは出さない。カードは背景の上に並べ、まとまりの面と線は付けない */
+  .tbl-block { background: none; border: 0; border-radius: 0; overflow: visible; }
+  .tbl-cards, .tbl-cards tbody, .tbl-cards tfoot { display: block; width: 100%; }
+  .tbl-cards thead { display: none; }
+  .tbl-cards tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+    row-gap: 4px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .tbl-cards tbody tr:last-child { border-bottom: 0; }
+  .tbl-cards td,
+  .tbl-cards td:first-child,
+  .tbl-cards td:last-child {
+    display: block;
+    height: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+  .tbl-cards tr.is-over { background: var(--c-50); }
+  .tbl-cards tr.is-over td, .tbl-cards tr.is-link:hover td, .tbl-cards tr.is-link:focus-within td { background: none; }
+  .tbl-cards tr.is-link:focus-within { background: var(--bg); }
+  .tbl-cards tr.is-focus { border-left: 3px solid var(--c-700); padding-left: 13px; }
+  .tbl-cards tr.is-focus td:first-child { border-left: 0; padding-left: 0; }
+  .tbl-cards tfoot tr { border-top: 1px solid var(--ink-3); border-bottom: 0; }
+
+  .tbl-cards .k-head { grid-column: 1; grid-row: 1; align-self: center; }
+  .tbl-cards .k-tag { grid-column: 2; grid-row: 1; justify-self: end; align-self: center; text-align: right; }
+  .tbl-cards .k-title { grid-column: 1 / -1; font-size: 15px; line-height: 1.5; }
+  .tbl-cards .k-wide { grid-column: 1 / -1; }
+  .tbl-cards .k-row {
+    grid-column: 1 / -1;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .tbl-cards .k-row::before {
+    content: attr(data-label);
+    color: var(--ink-2);
+    font-size: var(--fs-s);
+    font-weight: 400;
+    text-align: left;
+    white-space: normal;
+  }
+  .tbl-cards .k-wide .bar { width: 100%; }
+}
+
+/* ---------- 印刷（A4 縦） ---------- */
+
+@page { size: A4 portrait; margin: 12mm; }
+
+@media print {
+  :root { --gut: 0px; }
+  body { background: var(--surface); font-size: 10pt; }
+  .app { display: block; }
+  .side, .topbar, .actionbar, .fixbar, .toolbar, .filters, .chips, .chip, .actions, .act, .btn, .form-actions,
+  .tools, .menu-btn, .flash, .crumbs, .back, .dlg, .dlg-back, .oplist, .log-more, .col-ops { display: none !important; }
+  /* 主でない操作だけのパネルは出さない。履歴は全件を出す */
+  .panel:has(> .oplist), .panel:has(> .panel-body > .oplist:only-child) { display: none !important; }
+  .log li.is-old { display: grid !important; }
+  .content { padding: 0; }
+  .page-head { margin-bottom: 8pt; }
+  .panel { border: 0; margin-bottom: 12pt; break-inside: auto; }
+  .screen > :last-child, .panel:last-child { margin-bottom: 0; }
+  /* パネルの見出しだけがページの末尾に残らないようにする */
+  .panel-head { padding: 0 0 4pt; min-height: 0; border-bottom: 1px solid var(--ink-3); break-after: avoid; }
+  .panel-head + * { break-before: avoid; }
+  .tbl-block { background: none; border: 0; border-radius: 0; overflow: visible; }
+  .tbl-wrap { overflow: visible; }
+  .tbl { font-size: 8.5pt; table-layout: auto; }
+  .tbl th { position: static; height: auto; padding: 3pt 4pt; background: var(--surface); border-bottom: 1px solid var(--ink-3); white-space: normal; }
+  /* 折り返さない列は見出しも折り返さない */
+  .tbl th.nw { white-space: nowrap; }
+  .tbl td { height: auto; padding: 3pt 4pt; }
+  .tbl th:first-child, .tbl td:first-child { padding-left: 0; }
+  .tbl th:last-child, .tbl td:last-child { padding-right: 0; }
+  .tbl thead { display: table-header-group; }
+  .tbl tfoot { display: table-row-group; }
+  .tbl tr, .log li, .notice, .sum { break-inside: avoid; page-break-inside: avoid; }
+  .tbl tr.is-link:hover td, .tbl tr.is-link:focus-within td { background: none; }
+  /* 件数、表の見出し、焦点の行は表の左端と本文の大きさにそろえる */
+  .tbl-count { padding-left: 0; padding-right: 0; font-size: 8.5pt; }
+  .tbl th { font-size: 8.5pt; }
+  .sub-line { font-size: 7.5pt; }
+  .tbl tr.is-focus td:first-child { border-left: 0; padding-left: 0; }
+  /* 枠を消したパネルの中身と0件の文は見出しと表の左端にそろえる */
+  .panel-body, .panel-foot, .empty { padding-left: 0; padding-right: 0; }
+  /* 履歴は表と同じ左端と大きさで刷る */
+  .log li { padding-left: 0; padding-right: 0; font-size: 8.5pt; column-gap: 8pt; }
+  .log-detail, .log-reason { font-size: 7.5pt; }
+  /* 入力欄は枠、地、つまみ、必須の印を出さず、値の文字だけを周りの文字と同じ大きさで刷る。単位の文字は残す */
+  .field .input, .field .select, .field .textarea {
+    min-height: 0; height: auto;
+    padding: 0 !important; border: 0 !important; background: none !important;
+    color: var(--ink); font-size: inherit; line-height: inherit;
+    -webkit-appearance: none; appearance: none; resize: none;
+  }
+  .field .textarea { field-sizing: content; overflow: hidden; }
+  .field .input-wrap { border: 0 !important; background: none !important; }
+  .field .unit { font-size: inherit; color: inherit; }
+  /* フォームの欄は値の幅だけを取って左に寄せ、単位は値のすぐ後に置く */
+  .form .field .input, .form .field .select, .form .field .textarea {
+    field-sizing: content; width: auto; min-width: 0; max-width: 100%; align-self: flex-start;
+  }
+  .form .field .input.num { text-align: left; }
+  .form .field .input-wrap { width: auto; max-width: 100%; align-self: flex-start; }
+  .form .field .input-wrap .input { flex: none; }
+  .form .field .unit { padding: 0; }
+  .field-label .req { display: none; }
+  /* 空の欄は部品の代わりに「–」を刷る */
+  .field[data-empty] > .input, .field[data-empty] > .select, .field[data-empty] > .textarea,
+  .field[data-empty] > .input-wrap { display: none; }
+  .field[data-empty]::after { content: "–"; order: 1; }
+  .field .hint, .field .err { order: 2; }
+  .bar { width: 60px; min-width: 60px; }
+  a { color: var(--ink); text-decoration: none; }
+  .tag-over, .bar-fill, .bar-over, .bar::after, .tbl tr.is-over td, .notice,
+  .heat-1, .heat-2, .heat-3, .heat-4, .heat-5 {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* メニューの開閉ボタン（幅 900 以下で出る） */
+.menu-btn {
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--ink-3);
+  border-radius: var(--r);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: var(--fs-s);
+  cursor: pointer;
+}
+.menu-btn[aria-expanded="true"] { background: var(--bg); }
+@media (max-width: 640px) {
+  .menu-btn { min-height: var(--tap); }
+}
+
+/* カードに組み替えた表: 合計の行、濃淡のセル、出さない列 */
+@media (max-width: 640px) {
+  .tbl-cards tfoot td { height: auto; border-top: 0; background: none; }
+  .tbl-cards td.k-row { display: flex; }
+  /* 合計の行は1列目の文字（合計など）を見出しにする。2列目からの数字は各列の見出しを添えて並べる */
+  .tbl-cards tfoot td:first-child {
+    display: block; grid-column: 1; grid-row: 1; align-self: center;
+    text-align: left; white-space: normal;
+  }
+  .tbl-cards tfoot td:first-child::before { content: none; }
+  .tbl-cards tfoot td:first-child:empty { display: none; }
+  .tbl-cards td.heat-1, .tbl-cards td.heat-2, .tbl-cards td.heat-3,
+  .tbl-cards td.heat-4, .tbl-cards td.heat-5 { padding: 2px 6px; border-radius: var(--r); }
+  .tbl-cards td.heat-1 { background: var(--c-50); }
+  .tbl-cards td.heat-2 { background: var(--c-100); }
+  .tbl-cards td.heat-3 { background: var(--c-300); }
+  .tbl-cards td.heat-4 { background: var(--c-500); }
+  .tbl-cards td.heat-5 { background: var(--c-900); }
+  .tbl-cards td.heat-4::before, .tbl-cards td.heat-5::before { color: var(--surface); }
+  /* k-hide の列は最初と最後の列、見出し付きの行でも出さない（td:first-child、td:last-child、td.k-row より後に置く）。
+     合計の行の1列目だけは上の規則が勝ち、見出しとして出る */
+  .tbl-cards td.k-hide { display: none; }
+}
+
+/* 表のセル、見出し、ボタン、押せない理由、知らせ、項目の値、履歴の文、入力欄の注記と誤り、空の表示、ダイアログの本文、役割の説明は文節で折り返す。
+   長い英数字は枠の中で折る */
+@supports (word-break: auto-phrase) {
+  .tbl th, .tbl td, h1, .btn, .reason, .notice-title,
+  .notice p, .info dd, .kv dd, .sum dt, .sum dd, .log-detail, .log-reason, .hint, .err,
+  .empty p, p.empty, .dlg-body > p, .viewas { word-break: auto-phrase; overflow-wrap: anywhere; }
+}
+/* 文の最後の行に1文字だけ残さない。折り返さない指定（white-space: nowrap）を消さないよう text-wrap-style で付ける。
+   ダイアログの本文は「（…）を」の「を」が次の行に送られるので付けない */
+@supports (text-wrap-style: pretty) {
+  .notice p, .info dd, .kv dd, .sum dt, .sum dd, .log-detail, .log-reason, .flash, .hint, .err,
+  .empty p, p.empty, .viewas { text-wrap-style: pretty; }
+}
+/* 知らせは句読点を行頭に置かない。幅640以下では文節で区切らず、行の右端まで詰めて折り返す */
+.flash { word-break: normal; overflow-wrap: anywhere; line-break: strict; }
+/* 幅641以上では文とリンクを1つの流れに続け、文の最後の行の後ろにリンクを置く。文節の切れ目で折り返し、行は左寄せのまま。
+   直す道と「次: 」は新しい行から始める。間の空白は word-spacing で 16px にする */
+@media (min-width: 641px) {
+  .flash { display: block; word-break: auto-phrase; word-spacing: 12px; }
+  .flash > * { word-spacing: normal; }
+  .flash > span:not(:first-child) { display: block; margin-top: 4px; }
+}
+
+/* 左上の会社名と基準日は語の途中で折り返さない */
+.side-meta .nowrap, #base-date { white-space: nowrap; }
+
+/* 状態の段、項目の並び、金額の集計を続けて置くときの間隔 */
+.steps + .info, .steps + .sums, .info + .sums { margin-top: 16px; }
+
+/* 画面: 月次の締め */
+/* 締めを止めている件数は地の色を敷いた太字にする */
+.shime .shime-count { padding: 1px 6px; border-radius: var(--r); background: var(--c-50); color: var(--c-900); font-weight: 600; white-space: nowrap; }
+.shime .shime-check h3 { margin-bottom: 6px; font-size: var(--fs); font-weight: 600; }
+.shime .shime-group + .shime-group { margin-top: 16px; }
+@media print, (min-width: 1101px) {
+  /* 止めている項目と警告を左右に並べる */
+  .shime .shime-check { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 32px; }
+  .shime .shime-group + .shime-group { margin-top: 0; }
+}
+.shime .shime-items { list-style: none; display: grid; gap: 8px; }
+.shime .shime-items li { display: grid; gap: 2px; }
+.shime .shime-links { font-size: var(--fs-s); text-wrap: balance; }
+/* 番号と後ろの「、」は途中で折り返さない */
+.shime .shime-no { white-space: nowrap; }
+/* 工事名の括弧書きは括弧の前の空きを詰め、行の頭に来ても1行目と頭がそろう */
+.shime .shime-paren { margin-left: -0.5em; }
+.shime .shime-hours { width: 112px; margin-left: auto; }
+/* 時間の欄の誤りは左にそろえる。641 以上は欄の幅で折り返さず、欄の左端から1行で出す */
+.shime .shime-hours .err { white-space: normal; text-align: left; }
+@media (min-width: 641px) {
+  .shime .shime-hours .err { white-space: nowrap; align-self: flex-start; }
+}
+/* 締めた回数と締めた日は見出しの状態の札の横に並べる */
+.shime .shime-closed { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 16px; font-size: var(--fs-s); }
+.shime .shime-closed div { display: flex; gap: 6px; white-space: nowrap; }
+.shime .shime-closed dt { color: var(--ink-2); }
+/* 止めている項目のリンクで移ったとき、節の頭を画面の上の端から 16px の所に置く。1101 以上は html の scroll-padding-top（52px）から 36px を引く */
+.shime #shime-labor { scroll-margin-top: 16px; }
+@media (min-width: 1101px) {
+  .shime #shime-labor { scroll-margin-top: -36px; }
+}
+/* 行の保存の後の知らせは押した行の直下に付ける。上の行との間の線は消す。知らせの長さで列の幅を変えない。印刷では出さない */
+@media screen {
+  .shime .tbl tr.shime-flashrow td { height: auto; padding: 0 16px 12px; }
+  .shime .tbl tr:has(+ tr.shime-flashrow) td { border-bottom-color: transparent; }
+  .shime .tbl tr.shime-flashrow .flash { margin: 0; contain: inline-size; }
+}
+@media screen and (min-width: 641px) {
+  /* 計上者、計上日、操作の列は札と日付とボタンが入る幅に決め、表が横に動く幅でもそれより縮めない。行を計上しても列の幅を変えない */
+  .shime .shime-who { width: 4.5em; min-width: 4.5em; }
+  .shime .shime-on { width: 6.75em; min-width: 6.75em; white-space: nowrap; }
+  .shime .shime-op { width: 7em; min-width: 7em; }
+  /* 計上者の列は金額の列から離し、未計上の行の金額と計上者の「–」を続けて読ませない */
+  .shime #shime-labor .tbl th:nth-child(6), .shime .shime-who { padding-left: 32px; }
+  /* 工事名は文節の途中で折り返さず、折り返した行の長さをそろえる。列は一番長い文節が入る幅より縮めない */
+  .shime .shime-name { overflow-wrap: normal; text-wrap: balance; }
+}
+@media screen and (min-width: 641px) and (max-width: 1279px) {
+  /* 行のボタンの押せない理由は、横に並べると工事名の列が狭くなる幅ではボタンの下に置く */
+  .shime .tbl td.col-ops .act-side { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+@media screen and (min-width: 641px) and (max-width: 1100px) {
+  /* 数字は3列2段にし、1つだけ次の段に落ちる並びを作らない */
+  .shime .sums { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .shime .sums .sum:nth-child(3n) { border-right: 0; }
+  .shime .sums .sum:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+  /* 行の保存の後の知らせは表の見えている幅に収め、表を横に動かしても左の端に留める */
+  .shime #shime-labor .tbl-wrap { container-type: inline-size; }
+  .shime .tbl tr.shime-flashrow .flash { position: sticky; left: 16px; width: calc(100cqi - 32px); }
+}
+@media (max-width: 640px) {
+  /* 番号は高さ 44px の升目に並べ、区切りの「、」は出さない */
+  .shime .shime-links { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); }
+  .shime .shime-links .shime-sep { display: none; }
+  .shime .shime-items a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  .shime .shime-items li { gap: 0; }
+  /* 時間の見出しは欄の値と同じ高さに置き、欄の下に誤りが出ても動かさない。誤りはカードの幅で欄の下に出す */
+  .shime .tbl-cards td.k-row:has(> .shime-hours) { flex-wrap: wrap; align-items: baseline; row-gap: 4px; }
+  .shime .tbl-cards .shime-hours { display: contents; }
+  .shime .tbl-cards .shime-hours .input-wrap { width: 132px; margin-left: auto; }
+  .shime .tbl-cards .shime-hours .err { flex: 1 0 100%; }
+  /* カードでは知らせを押したカードの下に付け、間の線を消す */
+  .shime .tbl-cards tr:has(+ tr.shime-flashrow) { border-bottom-color: transparent; }
+  .shime .tbl-cards tr.shime-flashrow { padding-top: 0; }
+  .shime .tbl-cards tr.shime-flashrow td { grid-column: 1 / -1; padding: 0; }
+  /* 止めている件数を数えない月のカードには、その行を出さない */
+  .shime .tbl-cards td.shime-none { display: none; }
+  /* 数字は最初の1つで1行を使い、残りの4つを2つずつ並べる */
+  .shime .sums .sum:first-child { grid-column: 1 / -1; }
+  .shime .sums .sum:nth-child(odd) { border-right: 0; }
+  .shime .sums .sum:nth-child(even) { border-right: 1px solid var(--line); }
+}
+@media print {
+  /* 時間の欄の単位は値に続けて刷る */
+  .shime .shime-hours .unit { padding: 0; }
+  /* 未計上の行は金額の代わりに値の無い印を刷り、計上日の札は日付と同じ文字で刷る。行の高さは計上した行とそろう */
+  .shime td.shime-pend > * { display: none; }
+  .shime td.shime-pend::after { content: "–"; }
+  .shime td.shime-on .tag { display: inline; padding: 0; border: 0; font-size: inherit; color: inherit; vertical-align: baseline; }
+  /* 計上者の列は金額の列から離す */
+  .shime #shime-labor .tbl th:nth-child(6), .shime .shime-who { padding-left: 16pt; }
+  /* 行の保存の後の知らせの行は刷らない */
+  .shime .tbl tr.shime-flashrow { display: none; }
+  /* 数字は1段に並べ、見出しは1行に収める */
+  .shime .sums { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .shime .sum { padding-left: 6px; padding-right: 6px; }
+  .shime .sum dt { white-space: nowrap; }
+}
+/* 画面: 月次の締め ここまで */
+
+/* 画面: 予算と実績の差異 */
+.sai .sai-conds { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; min-width: 0; }
+.sai .sai-field { flex: 0 0 auto; min-width: 112px; }
+@media (min-width: 641px) {
+  .sai .filters .chip { min-height: var(--ctl); }
+}
+/* 同じ工事の行は、最初の行の工事番号、工事名、工事担当を縦に伸ばして1つのまとまりに見せる。2行目からのセルは出さない */
+.sai .tbl tr.sai-cont td.sai-key { display: none; }
+.sai .tbl tbody.sai-g:last-of-type td.sai-key { border-bottom: 0; }
+/* 工事ごとの tbody の境にも線を引き、指した工事はまとまり全体の地の色を変える。消化率の濃淡はそのまま残す */
+@media (min-width: 641px) {
+  .sai .tbl td.sai-key[rowspan] { vertical-align: top; }
+  .sai .tbl tbody.sai-g:not(:last-of-type) tr:last-child td { border-bottom: 1px solid var(--line); }
+  .sai .tbl tbody.sai-g:hover td:not(.heat-1):not(.heat-2):not(.heat-3):not(.heat-4):not(.heat-5),
+  .sai .tbl tbody.sai-g:focus-within td:not(.heat-1):not(.heat-2):not(.heat-3):not(.heat-4):not(.heat-5) { background: var(--bg); }
+}
+/* 画面では縦に伸ばしたセルの文字を、まとまりの最初の行の文字と同じ高さに置く */
+@media screen and (min-width: 641px) {
+  .sai .tbl td.sai-key[rowspan] { padding-top: calc((var(--row) - 1px - 1lh) / 2); }
+}
+/* 印刷では消化率の濃淡の帯の右の端と数字の間を空け、見出しと合計の数字も同じ位置にそろえる */
+@media print {
+  .sai .tbl th:last-child, .sai .tbl td:last-child { padding-right: 4pt; }
+}
+/* 幅640以下で書き出せないときの理由は、ボタンの横で上下の中央にそろえる */
+@media (max-width: 640px) {
+  .sai .actionbar .act-side { align-items: center; }
+}
+/* 画面の幅 1279 以下は列の間を詰め、金額の列の名前を1行のまま入れる */
+@media screen and (min-width: 641px) and (max-width: 1279px) {
+  .sai .tbl th, .sai .tbl td { padding-left: 8px; padding-right: 8px; }
+  .sai .tbl th:first-child, .sai .tbl td:first-child { padding-left: 16px; }
+  .sai .tbl th:last-child, .sai .tbl td:last-child { padding-right: 16px; }
+}
+/* 見出しの（円）は括弧の前の空きを詰め、閉じ括弧の右の空きの分だけ右へ出して、文字の右端を金額の右端にそろえる */
+.sai .tbl th .sai-paren { margin-left: -0.5em; margin-right: -0.5em; }
+/* 641〜1100 は表の入れ物の幅で詰め方を決め、横に送らずに収める。見出しの2行化、列の間を 12px、工事担当、発生原価、差異の列を外す、の順。
+   どの段も、1つ前の段の表の最小の幅に 16px を足した幅より狭いときに効く */
+@media screen and (min-width: 641px) and (max-width: 1100px) {
+  .sai > .tbl-block { container: sai-tbl / inline-size; }
+}
+@container sai-tbl (max-width: 831px) {
+  .sai .tbl th { vertical-align: baseline; padding-top: 2px; padding-bottom: 2px; }
+  .sai .tbl th .sai-line2 { display: block; }
+}
+@container sai-tbl (max-width: 796px) {
+  .sai .tbl th, .sai .tbl td { padding-left: 6px; padding-right: 6px; }
+  /* 消化率は濃淡の帯の左の端と「超過」の間を空け、その分だけ右の端を詰める */
+  .sai .tbl th:last-child, .sai .tbl td:last-child { padding-left: 10px; padding-right: 12px; }
+}
+@container sai-tbl (max-width: 764px) {
+  .sai .tbl .sai-c-mgr { display: none; }
+}
+@container sai-tbl (max-width: 724px) {
+  .sai .tbl .sai-c-inc { display: none; }
+}
+/* 差異の列を外す幅では、表の下の注からも差異の部分を外す */
+@container sai-tbl (max-width: 645px) {
+  .sai .tbl .sai-c-rem, .sai .sai-note-rem { display: none; }
+}
+/* 工事名は「・」や括弧の前でだけ折り返す（列の最小の幅を区切りまでの幅にする） */
+.sai .tbl td { overflow-wrap: break-word; }
+.sai .tbl td.sai-key > span { word-break: keep-all; }
+/* 工事名を工事番号の横に添えるのはカードのときだけ */
+.sai .sai-hname { display: none; }
+@media (max-width: 640px) {
+  /* 1段目に検索と超過だけ、2段目に工事担当と並べ替えを並べ、どちらの段も欄1つの高さに収める */
+  .sai .filters { flex-direction: row; align-items: flex-end; }
+  .sai .filters > .grow { position: relative; flex: 1 1 0; min-width: 0; }
+  .sai .sai-conds { flex: 1 1 100%; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .sai .sai-field { position: relative; min-width: 0; }
+  /* 検索の欄の名前は読み上げにだけ残す。何を探せるかは欄の中の例で示す */
+  .sai .filters > .grow > .field-label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip-path: inset(50%); white-space: nowrap;
+  }
+  /* 工事担当と並べ替えの名前は枠の中の左上に置き、選んだ値をその下に出す。名前の左端は値の左端にそろえる */
+  .sai .sai-field .field-label {
+    position: absolute; top: 4px; left: 15px; right: 32px;
+    overflow: hidden; font-size: var(--fs-xs); line-height: 1.25; white-space: nowrap;
+    pointer-events: none;
+  }
+  .sai .sai-field .select { padding-top: 16px; }
+  /* 工事ごとに1枚。工事番号と工事名の下に費目を1行ずつ並べ、列の名前は上に固定する */
+  .sai .tbl-cards tr { grid-template-columns: 3em minmax(0, 1fr) minmax(0, 1fr) 6.5em; column-gap: 8px; }
+  .sai .tbl-cards thead { display: block; position: sticky; top: 0; z-index: 2; background: var(--bg); }
+  .sai .tbl-cards thead tr { padding: 0 16px; border-bottom: 1px solid var(--ink-3); }
+  .sai .tbl-cards th { position: static; height: auto; padding: 6px 0; border: 0; font-size: var(--fs-xs); }
+  .sai .tbl-cards th:nth-child(-n+3), .sai .tbl-cards th:nth-child(7), .sai .tbl-cards th:nth-child(8) { display: none; }
+  /* 列の名前に左右の余白が無いので、閉じ括弧の右の空きは列の間へ出して、文字の右端を金額の右端にそろえる */
+  .sai .tbl-cards th .sai-paren { margin-right: 0; }
+  .sai .tbl-cards th:has(.sai-paren) { margin-right: -0.5em; }
+  .sai .tbl-cards tbody tr { row-gap: 0; padding: 2px 16px; border-bottom: 0; }
+  .sai .tbl-cards tbody.sai-g { padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+  .sai .tbl-cards tbody.sai-g:last-of-type { border-bottom: 0; }
+  .sai .tbl-cards tbody.sai-g:focus-within { background: var(--bg); }
+  .sai .tbl-cards tbody td.k-head { grid-column: 1 / -1; }
+  .sai .tbl-cards td.k-head .row-link { gap: 8px; }
+  /* 工事の見出しの焦点の枠は、押せる範囲の内側に引いて上の区切り線と下の行から離す。左右は余白の分だけ広げ、文字の位置は変えない */
+  .sai .tbl-cards td.k-head .row-link { margin: 0 -8px; padding: 0 8px; }
+  .sai .tbl-cards td.k-head .row-link:focus-visible { outline-offset: -6px; }
+  .sai .tbl-cards .sai-hno { flex: none; }
+  .sai .tbl-cards .sai-hname { display: inline; min-width: 0; color: var(--ink); white-space: normal; }
+  .sai .tbl-cards td.k-row:not(.k-hide) { grid-column: auto; display: block; }
+  /* 費目の行の文字は、消化率の濃淡の帯の中の文字と同じ高さに置く */
+  .sai .tbl-cards tbody td.k-row { padding-top: 2px; padding-bottom: 2px; }
+  .sai .tbl-cards td.k-row::before { content: none; }
+  .sai .tbl-cards td.sai-cat { text-align: left; }
+  /* カードに差異は出さないので、表の下の注も消化率の部分だけにする */
+  .sai .sai-note-rem { display: none; }
+}
+/* 画面: 予算と実績の差異 ここまで */
+
+/* 画面: 発注検収の登録 */
+.kenshu .kenshu-title { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px 12px; }
+.kenshu .kenshu-form { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+.kenshu .kenshu-fix { margin: 16px 0 0; }
+.kenshu .kenshu-ph { white-space: nowrap; }
+/* 始め括弧の前の空きを前のまとまりの後ろに移し、括弧が行頭に来たときは頭を前の行にそろえる */
+.kenshu .kenshu-pre { padding-right: 0.5em; }
+.kenshu .kenshu-open { margin-left: -0.5em; }
+/* 工事の値は2列分の幅を取る。発注の項目の2段目は1段目と同じ間隔で続ける */
+.kenshu .kenshu-sel > .info > .kenshu-kouji { grid-column: span 2; }
+.kenshu .kenshu-sel > .kenshu-rest { margin-top: 12px; }
+.kenshu .kenshu-entry { margin-top: 16px; }
+/* 直し方の文は、折り返した行も「直し方」の後ろの位置から始める */
+.kenshu .kenshu-fix .notice-fix-label { display: inline-block; width: 3em; white-space: nowrap; text-indent: 0; }
+.kenshu .kenshu-fix p:has(> .notice-fix-label) { padding-left: calc(3em + 8px); text-indent: calc(-3em - 8px); }
+@media (min-width: 641px) {
+  /* 対象の発注の一覧は、一覧の幅で列の間と出す列を決める */
+  .kenshu .kenshu-list { container: kenshu-list / inline-size; }
+  /* 絞り込みの選択欄は、選択肢が減っても全部の選択肢のときと同じ幅で置く */
+  .kenshu .kenshu-list .filters .select[name="kenshu-kouji"] { min-width: 20em; }
+  .kenshu .kenshu-list .filters .select[name="kenshu-partner"] { min-width: 9em; }
+  /* 取引先は1行で置き、足りない幅は件名の折り返しで取る */
+  .kenshu .kenshu-list .tbl td.kenshu-partner { white-space: nowrap; }
+}
+@media print, (min-width: 641px) and (max-width: 1279px) {
+  /* 対象の発注の工事番号は発注番号の頭と同じなので出さず、取引先と件名に幅を回す */
+  .kenshu .kenshu-list .tbl tr > :nth-child(2) { display: none; }
+}
+@media screen {
+  @container kenshu-list (max-width: 860px) {
+    /* 一覧の幅が足りないときは列の間を詰め、取引先を1行で置いたまま件名と表の幅を取る */
+    .kenshu .kenshu-list .tbl th, .kenshu .kenshu-list .tbl td { padding-left: 6px; padding-right: 6px; }
+    .kenshu .kenshu-list .tbl th:first-child, .kenshu .kenshu-list .tbl td:first-child { padding-left: 16px; }
+    .kenshu .kenshu-list .tbl th:last-child, .kenshu .kenshu-list .tbl td:last-child { padding-right: 16px; }
+  }
+  @container kenshu-list (max-width: 780px) {
+    /* 一覧の幅が件名を読める幅で並べられないときは件名を出さず、状態の札は残す */
+    .kenshu .kenshu-list .tbl tr > :nth-child(4) { display: none; }
+  }
+}
+@media print {
+  /* 表の列の間は画面と同じだけ空け、隣の列の値と続けて読めないようにする */
+  .kenshu .tbl th:not(:first-child), .kenshu .tbl td:not(:first-child) { padding-left: 7.5pt; }
+  .kenshu .tbl th:not(:last-child), .kenshu .tbl td:not(:last-child) { padding-right: 7.5pt; }
+}
+@media (max-width: 640px) {
+  /* 工事の絞り込みは1行を使い、取引先と札をその下の1行に並べる */
+  .kenshu .filters { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; }
+  .kenshu .filters > .field:first-child { grid-column: 1 / -1; }
+  /* 候補のカードは2行にする。1行目に発注番号、打切の札、未検収残、2行目に取引先と納期を並べる。発注番号のリンクの高さが増えた分は上の余白で詰める */
+  .kenshu .kenshu-list .tbl-cards tr { grid-template-columns: auto auto minmax(0, 1fr) auto; padding-top: calc(12px - (var(--tap) - 1lh) / 2); }
+  .kenshu .kenshu-list .tbl-cards td.k-tag { grid-column: 2; grid-row: 1; justify-self: start; align-self: center; text-align: left; }
+  /* 未検収残は金額の幅をそろえ、見出しの位置を桁数によらず行ごとに同じにする。札が並んで幅が足りない行は、見出しの4文字分を残して金額の幅を詰める */
+  .kenshu .kenshu-list .tbl-cards td.kenshu-remain {
+    grid-column: 3 / -1; grid-row: 1; align-self: center;
+    display: grid; grid-template-columns: auto minmax(min(9ch, 100% - 4em - 12px), max-content); justify-content: end; align-items: center;
+  }
+  /* 未検収残の見出しは「未検収残」と「（円）」の間だけで折り返す */
+  .kenshu .kenshu-list .tbl-cards td.kenshu-remain::before { word-break: keep-all; }
+  .kenshu .kenshu-list .tbl-cards td.kenshu-partner { grid-column: 1 / 4; grid-row: 2; }
+  .kenshu .kenshu-list .tbl-cards td.kenshu-due { grid-column: 4; grid-row: 2; align-self: center; }
+  /* 工事、取引先、件名の下に金額の集計と登録欄を置き、ほかの項目を後ろに回す */
+  .kenshu .kenshu-sel { display: flex; flex-direction: column; }
+  .kenshu .kenshu-sel > .kenshu-entry { order: 1; }
+  .kenshu .kenshu-sel > .kenshu-rest { order: 2; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+  /* 工事は1行を使い、工事番号と工事名を別の行に置く */
+  .kenshu .kenshu-sel > .info > .kenshu-kouji { grid-column: 1 / -1; }
+  .kenshu .kenshu-kno { display: block; }
+  /* 取消の理由は見出しを上の1行に置き、文は横いっぱいで折り返す */
+  .kenshu .tbl-cards td.kenshu-reason:not(.k-hide) { display: block; text-align: left; white-space: normal; }
+  .kenshu .tbl-cards td.kenshu-reason:not(.k-hide)::before { display: block; white-space: nowrap; }
+  /* 押せない「取消」「訂正」の理由は、文の長さによらずボタンの下に置く */
+  .kenshu .tbl-cards .act-side { flex-direction: column; align-items: flex-start; gap: 4px; }
+}
+/* 画面: 発注検収の登録 ここまで */
+
+/* 画面: 工事一覧 */
+/* 検索と絞り込みの帯は2段。1段目は欄と保存した条件、2段目は札 */
+.kouji_list .filters { flex-direction: column; flex-wrap: nowrap; align-items: stretch; gap: 12px; }
+.kouji_list .kouji_list-row { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; min-width: 0; }
+.kouji_list .kouji_list-row > .grow { flex: 1 1 180px; }
+.kouji_list .kouji_list-conds { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px 16px; }
+.kouji_list .kouji_list-field { flex: 0 0 auto; min-width: 112px; }
+.kouji_list .kouji_list-saved { display: flex; align-items: flex-end; gap: 8px; margin-left: auto; }
+.kouji_list .kouji_list-toggle { display: none; }
+.kouji_list .kouji_list-used { margin-left: 6px; font-weight: 600; color: var(--c-700); }
+.kouji_list .kouji_list-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kouji_list .kouji_list-group-label { font-size: var(--fs-s); color: var(--ink-2); }
+@media (min-width: 641px) {
+  .kouji_list .filters { container: kouji_list-band / inline-size; }
+  .kouji_list .filters .chip { min-height: var(--ctl); }
+  /* 検索欄の幅は決めておき、保存した条件の欄が広がっても検索欄と条件の欄は動かさない */
+  .kouji_list .kouji_list-row > .grow { flex: 0 0 240px; }
+  /* 保存した条件の欄は一番長い名前が入る幅にする。行に入らないときは次の行の右へ移る */
+  .kouji_list .kouji_list-saved { max-width: 100%; }
+  .kouji_list .kouji_list-saved .kouji_list-field { flex: 0 1 auto; min-width: 0; }
+  .kouji_list .kouji_list-saved select { width: auto; max-width: 100%; text-overflow: ellipsis; }
+  /* 2段目は見出しの行と札の行にそろえ、「条件を外す」を札の1行目に並べる */
+  .kouji_list .kouji_list-row.kouji_list-more {
+    display: grid; grid-template-rows: auto auto; grid-auto-flow: column; grid-auto-columns: max-content;
+    justify-content: start; align-items: start; gap: 4px 16px;
+  }
+  .kouji_list .kouji_list-row.kouji_list-more > .kouji_list-group { grid-row: span 2; display: grid; grid-template-rows: subgrid; align-items: start; }
+  .kouji_list .kouji_list-row.kouji_list-more > .act { grid-row: 2; }
+}
+/* 検索欄、条件の欄、保存のボタンが1行に入らない幅では、検索欄を1行に広げ、条件の欄と保存した条件を次の行に置く */
+@container kouji_list-band (width < 795px) {
+  .kouji_list .kouji_list-row > .grow { flex-basis: 100%; }
+}
+/* 2段目が1行に入らない幅では、状態の札を4つと3つの2行に組み、予算と「条件を外す」を同じ行に残す */
+@container kouji_list-band (width < 688px) {
+  .kouji_list .kouji_list-states .chips { display: grid; grid-template-columns: repeat(4, max-content); }
+}
+@container kouji_list-band (width < 798px) {
+  .kouji_list .kouji_list-row:has(> .act) .kouji_list-states .chips { display: grid; grid-template-columns: repeat(4, max-content); }
+}
+/* 件数の行。右に CSV の書き出し */
+.kouji_list .kouji_list-count {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px;
+  padding: 4px 16px 4px 0;
+  border-bottom: 1px solid var(--line);
+}
+.kouji_list .kouji_list-count .tbl-count { border-bottom: 0; }
+/* 工事名の括弧書きは括弧の前の空きを詰め、行の頭に来ても1行目と頭がそろう */
+.kouji_list .kouji_list-paren { margin-left: -0.5em; }
+/* 工事名と施主は文節で折り返し、2行の長さをそろえて最後の行に1字だけ残さない。施主は法人の種類の前後で折れる */
+@media (min-width: 641px) {
+  .kouji_list > .tbl-block .tbl td.kouji_list-name,
+  .kouji_list > .tbl-block .tbl td.kouji_list-client { overflow-wrap: normal; text-wrap: balance; }
+  .kouji_list > .tbl-block .tbl td.kouji_list-client { word-break: keep-all; }
+  /* 行の文字は1行目の高さでそろえ、消化率の横棒と超過の費目は数字の下に置く */
+  .kouji_list > .tbl-block .tbl td { vertical-align: baseline; }
+}
+@media (min-width: 1280px) {
+  .kouji_list > .tbl-block .tbl td.kouji_list-client { white-space: nowrap; }
+  .kouji_list > .tbl-block .tbl td.kouji_list-client wbr { display: none; }
+}
+/* 1279 以下は列の間を 16px にし、横棒を詰めて工事名と施主の幅を取る */
+@media screen and (min-width: 641px) and (max-width: 1279px) {
+  .kouji_list > .tbl-block .tbl th, .kouji_list > .tbl-block .tbl td { padding-left: 8px; padding-right: 8px; }
+  .kouji_list > .tbl-block .tbl th:first-child, .kouji_list > .tbl-block .tbl td:first-child { padding-left: 16px; }
+  .kouji_list > .tbl-block .tbl th:last-child, .kouji_list > .tbl-block .tbl td:last-child { padding-right: 16px; }
+  .kouji_list > .tbl-block .tbl .bar { width: 72px; min-width: 72px; }
+}
+/* 1199 以下は列の間を 12px にし、金額の見出しの（円）と工事担当の「担当」を2行目に送る */
+@media screen and (min-width: 641px) and (max-width: 1199px) {
+  .kouji_list > .tbl-block .tbl th, .kouji_list > .tbl-block .tbl td { padding-left: 6px; padding-right: 6px; }
+  .kouji_list > .tbl-block .tbl th { vertical-align: baseline; padding-top: 4px; }
+  .kouji_list > .tbl-block .tbl th .kouji_list-line2 { display: block; }
+}
+/* 641〜1100 は表の幅で出す列を決める。入らない列は 施主、発注済、受注金額 の順に外す */
+@media (min-width: 641px) and (max-width: 1100px) {
+  .kouji_list > .tbl-block { container: kouji_list-tbl / inline-size; }
+}
+@container kouji_list-tbl (max-width: 851px) {
+  .kouji_list.kouji_list-has-contract .tbl th:has(> .kouji_list-h-client),
+  .kouji_list.kouji_list-has-contract .tbl td.kouji_list-client { display: none; }
+}
+@container kouji_list-tbl (max-width: 771px) {
+  .kouji_list .tbl th:has(> .kouji_list-h-client), .kouji_list .tbl td.kouji_list-client { display: none; }
+}
+@container kouji_list-tbl (max-width: 755px) {
+  .kouji_list.kouji_list-has-contract .tbl th:has(> .kouji_list-h-committed),
+  .kouji_list.kouji_list-has-contract .tbl td.kouji_list-committed { display: none; }
+}
+@container kouji_list-tbl (max-width: 675px) {
+  .kouji_list .tbl th:has(> .kouji_list-h-committed), .kouji_list .tbl td.kouji_list-committed,
+  .kouji_list .tbl th:has(> .kouji_list-h-contract), .kouji_list .tbl td.kouji_list-contract { display: none; }
+}
+.kouji_list .kouji_list-rate { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; vertical-align: baseline; }
+.kouji_list .kouji_list-overcats { font-size: var(--fs-xs); color: var(--c-900); font-weight: 600; white-space: nowrap; }
+.kouji_list-wait { list-style: none; margin: 0; padding: 0; }
+.kouji_list-wait li {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 4px 12px;
+  min-height: var(--tap);
+  padding: 6px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.kouji_list-wait li:last-child { border-bottom: 0; }
+.kouji_list-wait .kouji_list-wait-count { font-weight: 600; }
+/* 印刷では待ちの行の左端を見出しと表にそろえる */
+@media print {
+  .kouji_list-wait li { padding-left: 0; padding-right: 0; }
+}
+@media (max-width: 640px) {
+  /* 検索と「絞り込み」だけを出し、ほかの条件はボタンで開く */
+  .kouji_list .kouji_list-row > .grow { flex: 1 1 160px; }
+  .kouji_list .kouji_list-toggle { display: inline-flex; flex: 0 0 auto; }
+  .kouji_list .kouji_list-more { display: none; }
+  .kouji_list .filters.is-open .kouji_list-more { display: flex; }
+  .kouji_list .filters.is-open .kouji_list-conds {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+  }
+  .kouji_list .kouji_list-conds { flex: 1 1 100%; }
+  .kouji_list .kouji_list-field { min-width: 0; }
+  .kouji_list .kouji_list-kouji-sort { grid-column: 1 / -1; }
+  /* 保存した条件の欄とボタンは、どちらも行いっぱいの幅で縦に並べる */
+  .kouji_list .kouji_list-saved { flex: 1 1 100%; flex-wrap: wrap; gap: 12px; margin-left: 0; }
+  .kouji_list .kouji_list-saved > * { flex: 1 1 100%; }
+  .kouji_list .kouji_list-saved > .act { align-items: stretch; }
+  .kouji_list .kouji_list-row.kouji_list-more > .kouji_list-group { flex: 1 1 100%; }
+  .kouji_list-wait a { display: inline-flex; align-items: center; min-height: var(--tap); }
+  /* カードの消化率は「消化率」と率を1行目に、横棒を2行目に行いっぱいで、超過の費目を3行目の右に出す */
+  .kouji_list .tbl-cards td.kouji_list-ratecell { flex-wrap: wrap; row-gap: 4px; }
+  .kouji_list .tbl-cards td.kouji_list-ratecell .kouji_list-rate,
+  .kouji_list .tbl-cards td.kouji_list-ratecell .rate { display: contents; }
+  .kouji_list .tbl-cards td.kouji_list-ratecell .bar { flex: 1 1 100%; width: 100%; }
+  .kouji_list .tbl-cards td.kouji_list-ratecell .kouji_list-overcats { margin-left: auto; }
+}
+/* 画面: 工事一覧 ここまで */
+
+/* 画面: 請求の確認 */
+/* 行のボタンは1段に同じ間隔で並べ、押せない理由はボタンの段の下に、ボタンの順に1つずつ置く。
+   理由は列の幅を広げず（contain）、列の幅の中で行の長さをそろえて折り返す */
+.seikyu .seikyu-ops { display: grid; grid-template-columns: auto auto 1fr; align-items: start; gap: 4px 8px; }
+.seikyu .seikyu-ops .act { display: contents; }
+.seikyu .seikyu-ops .btn { grid-row: 1; justify-self: start; }
+.seikyu .seikyu-ops .reason { grid-column: 1 / -1; contain: inline-size; text-wrap-style: balance; }
+.seikyu-nobr { white-space: nowrap; }
+/* 取引先名は語の途中で折り返さない。列は語の幅より狭めず、語が行に入らないときだけ途中で折り返す。長い語のある名前は行頭の禁則を守って字の間で折り返す */
+.seikyu .seikyu-name { word-break: keep-all; overflow-wrap: break-word; }
+.seikyu .seikyu-name-long { word-break: normal; line-break: strict; }
+/* 請求書番号は幅 7em を超えるときだけ折り返す */
+.seikyu .seikyu-ino { display: inline-block; width: max-content; max-width: 7em; white-space: normal; overflow-wrap: anywhere; }
+/* 幅641以上の検索欄は、案内の文が切れない幅より狭めない。狭いときは状態の切り替えを次の段へ送る */
+@media (min-width: 641px) {
+  .seikyu .filters > .field.grow { min-width: calc(21em + 22px); }
+}
+/* 請求額の見出しは、列が狭いときに（円）の前で折り返す */
+.seikyu .tbl th:has(+ th > .seikyu-more-h) { white-space: normal; word-break: normal; overflow-wrap: normal; }
+/* 再受付の押せない理由は、幅1101以上では1行、641から1100では番号の前でだけ折り返す */
+@media (min-width: 641px) and (max-width: 1100px) {
+  .seikyu .tbl td.seikyu-reacc .reason { width: 11.5em; }
+}
+@media (min-width: 1101px) {
+  .seikyu .tbl td.seikyu-reacc .reason { white-space: nowrap; }
+}
+/* 差戻しと取消の理由は、長くても取引先と請求額の列を押し縮めない幅で、行の長さをそろえて折り返す。幅1240以上と印刷では上限を 20em に広げる */
+.seikyu .seikyu-why { display: block; max-width: 16em; text-wrap-style: balance; }
+@media print, (min-width: 1240px) {
+  .seikyu .seikyu-why { max-width: 20em; }
+}
+/* 幅1101以上の確認済の一覧では、取引先名を1行に置く */
+@media (min-width: 1101px) {
+  .seikyu .seikyu-done .seikyu-name { white-space: nowrap; }
+  .seikyu .seikyu-done .seikyu-name wbr { display: none; }
+}
+/* 幅1101以上の確認済の一覧では、状態の札を1段に並べる */
+@media (min-width: 1101px) {
+  .seikyu .seikyu-done .tags { flex-wrap: nowrap; }
+}
+/* 直し方の枠の行。上の行との間の線を消し、焦点の行のまとまりの下に付ける */
+.seikyu .tbl tr.seikyu-fixrow td { height: auto; padding: 0 16px 12px; }
+.seikyu .tbl tr:has(+ tr.seikyu-fixrow) td { border-bottom-color: transparent; }
+.seikyu .tbl tr.seikyu-fixrow .notice { margin: 0; }
+.seikyu .notice-title { text-wrap-style: balance; }
+/* 焦点のまとまりで tbody が分かれても、まとまりの前後の行の下の線を残す */
+@media (min-width: 641px) {
+  .seikyu .tbl tbody:not(:last-of-type) > tr:last-child > td { border-bottom: 1px solid var(--line); }
+}
+/* 画面の幅641以上では、焦点の行の線を、判定の相手の行と直し方の枠の行まで、行の間の線で切らずに通す */
+@media screen and (min-width: 641px) {
+  .seikyu .tbl tbody.is-focus > tr > td:first-child { position: relative; border-left: 0; padding-left: 16px; }
+  .seikyu .tbl tbody.is-focus > tr > td:first-child::before {
+    content: ""; position: absolute; top: 0; bottom: -1px; left: 0; width: 3px; background: var(--c-700);
+  }
+}
+/* 直し方の枠の2行目からは、「直し方」の後の文の頭にそろえる。札の幅を字の幅によらず 3em に決めて、行の頭の位置を合わせる */
+.seikyu .notice .notice-fix-label { display: inline-block; width: 3em; margin-right: 8px; white-space: nowrap; text-indent: 0; }
+.seikyu .notice p:has(> .notice-fix-label),
+.seikyu .notice p:has(> .notice-fix-label) ~ p:not(.actions) { padding-left: calc(3em + 8px); }
+.seikyu .notice p:has(> .notice-fix-label) { text-indent: calc(-3em - 8px); }
+/* 折り返しのまとまり。まとまりの間で先に折り返す */
+.seikyu .seikyu-unit { display: inline-block; max-width: 100%; }
+/* 焦点の行の、幅640以下で隠れる列の値。カードの請求額の下にだけ出す。
+   値はカードの行と同じく右に揃え、長い理由だけは見出しの下に左から置く */
+.seikyu .tbl th:has(> .seikyu-more-h), .seikyu .tbl td.seikyu-more-c { display: none; }
+@media (max-width: 640px) {
+  .seikyu .seikyu-order { display: none; }
+  .seikyu .tbl-cards td.seikyu-more-c:not(:empty) { display: block; }
+  .seikyu .seikyu-more { align-items: center; font-size: var(--fs-s); line-height: 1.5; }
+  .seikyu .seikyu-more dd { text-align: right; overflow-wrap: anywhere; }
+  .seikyu .seikyu-more dd.seikyu-more-long { grid-column: 1 / -1; text-align: left; }
+  /* 発注番号のリンクは高さ44pxのまま、増えた高さを上下の行に重ねて行の間隔を他の行とそろえる */
+  .seikyu .seikyu-more a { display: inline-flex; align-items: center; min-height: var(--tap); margin: calc((1.5em - var(--tap)) / 2) 0; }
+  /* カードでは直し方の枠を詳細の下に置き、表の後ろの行は出さない */
+  .seikyu .seikyu-more-c .notice { margin: 12px 0 0; }
+  .seikyu .tbl-cards tr.seikyu-fixrow { display: none; }
+  /* 焦点のまとまりで tbody が分かれても、カードの間の線を残し、一覧の最後のカードには付けない */
+  .seikyu .tbl-cards tbody:not(:last-of-type) > tr:last-child { border-bottom: 1px solid var(--line); }
+  .seikyu .tbl-cards tbody:last-of-type > tr:has(+ tr.seikyu-fixrow:last-child) { border-bottom: 0; }
+}
+@media print {
+  /* 直し方の枠を表の左右の端にそろえる */
+  .seikyu .tbl tr.seikyu-fixrow td { padding-left: 0; padding-right: 0; }
+}
+/* 画面: 請求の確認 ここまで */
+
+/* 画面: 工事詳細 */
+/* 当初の予算と今の値の表を出すときは、改定の一覧との間を空けて線で分ける */
+.kouji_detail .kouji_detail-base + .kouji_detail-revs { margin-top: max(var(--gut), 16px); border-top: 1px solid var(--line); }
+/* 状態の段は見出しの直下に置き、印刷のボタンとの間を空ける */
+.kouji_detail > .steps { margin-bottom: var(--gut); }
+/* パネルの見出しの右は、押せない理由の有無にかかわらずボタンの上端をそろえる */
+.kouji_detail .panel-head .tools { align-items: flex-start; }
+/* 改定の起案で示す費目と額の組は途中で折り返さない */
+.kouji_detail-pair { white-space: nowrap; }
+/* 施主名は法人の種類の前後と空白で、工事場所は町名と建物名の間でだけ折り返す */
+.kouji_detail .info .kouji_detail-name { word-break: keep-all; }
+/* 状態を戻すと消える項目は、前置きの文の下に1つのまとまりで並べる */
+.kouji_detail-clears ul { list-style: none; margin-top: 4px; padding-left: 12px; border-left: 2px solid var(--line); }
+/* 直し方の2行目からは「直し方」の後ろの位置にそろえる */
+.kouji_detail .notice p:has(> .notice-fix-label),
+.kouji_detail .notice p:has(> .notice-fix-label) ~ p:not(.actions) { padding-left: 3.5em; }
+.kouji_detail .notice .notice-fix-label { display: inline-block; width: 3.5em; margin: 0 0 0 -3.5em; }
+/* 発注の一覧の金額の見出しは画面でだけ折り返す */
+@media screen and (min-width: 641px) {
+  .kouji_detail .kouji_detail-orders .tbl th.num { white-space: normal; }
+}
+@media (min-width: 641px) {
+  /* 発注の一覧の取引先と件名は文節の途中で切らずに幅を取る */
+  .kouji_detail .kouji_detail-orders .tbl td { overflow-wrap: break-word; }
+  /* 労務費は右寄せの金額と左寄せの計上日の間を空ける */
+  .kouji_detail .kouji_detail-labor .tbl th:last-child,
+  .kouji_detail .kouji_detail-labor .tbl td:last-child { padding-left: 2.5em; }
+  /* 建物名や会社名が列に収まらない幅では、語の途中で切らずにその列を広げる */
+  .kouji_detail .info { grid-template-columns: repeat(4, minmax(min-content, 1fr)); }
+  .kouji_detail .info .kouji_detail-name { overflow-wrap: normal; }
+  /* 押せない理由が付く2つの操作は間を空けて線で分ける。折り返して1つだけになった段の線は枠の外に出して切る */
+  .kouji_detail .actionbar:has(> .act + .act):has(.reason),
+  .kouji_detail .panel-head .tools:has(> .act + .act):has(.reason) {
+    column-gap: var(--gut); justify-content: flex-end; overflow: clip; overflow-clip-margin: calc(var(--gut) / 4);
+  }
+  .kouji_detail .actionbar:has(> .act + .act):has(.reason) > .act:not(:last-child),
+  .kouji_detail .panel-head .tools:has(> .act + .act):has(.reason) > .act:not(:last-child) { position: relative; }
+  .kouji_detail .actionbar:has(> .act + .act):has(.reason) > .act:not(:last-child)::after,
+  .kouji_detail .panel-head .tools:has(> .act + .act):has(.reason) > .act:not(:last-child)::after {
+    content: ""; position: absolute; top: 0; bottom: 0; right: calc(var(--gut) / -2); border-right: 1px solid var(--line);
+  }
+}
+/* 金額のまとめの値は、項目名が2行になった項目があっても下の端でそろえる。項目名は語の切れ目でだけ折り返す */
+.kouji_detail .sum { display: flex; flex-direction: column; justify-content: flex-end; }
+.kouji_detail .sum dt .kouji_detail-phrase { display: inline-block; }
+/* 金額のまとめは4項目なら1段、6項目なら3列2段にし、1つだけ次の段に落ちる並びを作らない。
+   6項目を1段に並べるのは、粗利の項目名が「粗利」と「（発生原価ベース、円）」の2行に収まる幅から */
+@media screen and (min-width: 641px) and (max-width: 1100px), print {
+  .kouji_detail .sums:not(:has(> .sum:nth-child(5))) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+}
+@media screen and (min-width: 641px) and (max-width: 1199px), print {
+  .kouji_detail .sums:has(> .sum:nth-child(5)) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kouji_detail .sums:has(> .sum:nth-child(5)) .sum:nth-child(3n) { border-right: 0; }
+  .kouji_detail .sums:has(> .sum:nth-child(5)) .sum:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+}
+@media (min-width: 1101px) {
+  .kouji_detail .sums:not(:has(> .sum:nth-child(5))) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .kouji_detail .kouji_detail-vs .bar { width: calc(var(--bar-w) * 2.5); height: calc(var(--bar-h) * 1.5); }
+}
+@media (min-width: 1200px) {
+  .kouji_detail .sums:has(> .sum:nth-child(5)) { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  /* 費目のカードの消化率は、見出しと率を1段目に、横棒を2段目に幅いっぱいで置く */
+  .kouji_detail .tbl-cards td.kouji_detail-rate { flex-wrap: wrap; row-gap: calc(var(--gut) / 4); }
+  .kouji_detail .tbl-cards td.kouji_detail-rate .rate { display: contents; }
+  .kouji_detail .tbl-cards td.kouji_detail-rate .bar { flex: 1 1 100%; width: 100%; }
+  .kouji_detail .tbl-cards .k-head a { flex-direction: column; align-items: flex-start; justify-content: center; }
+  /* 見出しの下に残る押せない操作が2つあるときは横に並べ、理由はそれぞれのボタンの下に置いて線で分ける */
+  .kouji_detail .actionbar:has(> .act + .act) { display: grid; grid-template-columns: repeat(2, auto); justify-content: start; column-gap: var(--gut); }
+  .kouji_detail .actionbar:has(> .act + .act) > .act:nth-child(2n) { position: relative; }
+  .kouji_detail .actionbar:has(> .act + .act) > .act:nth-child(2n)::before {
+    content: ""; position: absolute; top: 0; bottom: 0; left: calc(var(--gut) / -2); border-left: 1px solid var(--line);
+  }
+}
+@media print {
+  /* 状態の段と金額のまとめの間を、パネルどうしの間と同じくらい空ける */
+  .kouji_detail > .steps { margin-bottom: var(--fs-h2); }
+  .kouji_detail .sum dt { white-space: nowrap; }
+  /* 消化率の横棒は列の幅にそろえ、超過の札がある行でも左端をそろえる */
+  .kouji_detail .kouji_detail-vs .rate { display: flex; }
+  .kouji_detail .kouji_detail-vs .bar { width: 100%; }
+  .kouji_detail .tbl th:not(.num) { white-space: nowrap; }
+  /* 発注金額の列も並ぶ発注の一覧は、紙の幅に収めるため金額の見出しを折り返す */
+  .kouji_detail .kouji_detail-orders .tbl:has(th:nth-child(8)) th.num { white-space: normal; }
+  .kouji_detail .panel-body:has(> .info), .kouji_detail .tbl-block { break-inside: avoid; page-break-inside: avoid; }
+}
+/* 画面: 工事詳細 ここまで */
+
+/* 画面: 発注の登録と発注の詳細 */
+.hacchu .hacchu-budget { grid-row: span 2; align-self: start; border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; }
+.hacchu .hacchu-budget-title { font-size: var(--fs-s); color: var(--ink-2); margin-bottom: 6px; }
+/* 減額発注の未検収残は減らす額の横の1段に収める */
+.hacchu .hacchu-remain { grid-row: auto; }
+.hacchu .hacchu-lock { margin-bottom: 12px; }
+.hacchu .hacchu-lock p + p { margin-top: 4px; }
+.hacchu .hacchu-lead { margin-bottom: 16px; }
+/* 直せない欄の値。改行はそのまま出し、文節の切れ目で折り返す */
+.hacchu .hacchu-val { white-space: pre-wrap; overflow-wrap: anywhere; }
+@supports (word-break: auto-phrase) {
+  .hacchu .hacchu-val { word-break: auto-phrase; }
+}
+.hacchu .hacchu-ops { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 6px 8px; }
+.hacchu .hacchu-ops .act { display: contents; }
+.hacchu .hacchu-ops .reason { order: 1; flex: 0 0 100%; width: 0; }
+.hacchu .hacchu-over { font-size: var(--fs-s); color: var(--c-900); font-weight: 600; line-height: 1.5; }
+.hacchu .hacchu-form { margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--line); }
+/* 直し方の2行目以降と折り返した行は「直し方」の右の端から始める */
+.hacchu .notice p:has(> .notice-fix-label),
+.hacchu .notice p:has(> .notice-fix-label) ~ p:not(.actions) { padding-left: 3.5em; }
+.hacchu .notice .notice-fix-label { display: inline-block; width: 3.5em; margin: 0 0 0 -3.5em; }
+/* 取消と打切の理由は1行の幅いっぱいに出す */
+.hacchu .info > .hacchu-wide { grid-column: 1 / -1; }
+/* パンくずの区切りは前の段の後ろに置き、折り返した行を区切りから始めない */
+.hacchu .crumbs li + li::before { content: none; }
+.hacchu .crumbs li:not(:last-child)::after { content: "/"; margin: 0 6px; color: var(--ink-3); }
+@media (min-width: 1101px) {
+  .hacchu .hacchu-ops { min-width: 16em; }
+}
+@media (max-width: 640px) {
+  .hacchu .hacchu-budget { grid-row: auto; }
+}
+@media print {
+  /* 表の見出しの行だけがページの末尾に残らないよう、表は丸ごと次のページへ送る */
+  .hacchu .tbl-block { break-inside: avoid; page-break-inside: avoid; }
+  /* 右寄せの額のすぐ後の列は間を空け、額と次の値が1つの値に見えないようにする */
+  .hacchu .tbl-block .tbl th.num + th:not(.num),
+  .hacchu .tbl-block .tbl td.num + td:not(.num) { padding-left: 12pt; }
+}
+/* 画面: 発注の登録と発注の詳細 ここまで */
+
+/* 画面: 取引先の一覧 */
+/* 名称は法人の種類の前後、支払条件は締めと払いの間、合計の見出しは語の区切りでだけ折り返す */
+.torihikisaki .torihikisaki-ph { white-space: nowrap; }
+/* 合計の見出しの語の組は、組ごと次の行に送っても入らないときだけ組の中で折り返す */
+.torihikisaki .torihikisaki-ph-set { display: inline-block; }
+/* 件名の下の工事名は、長いときは折り返す */
+.torihikisaki .torihikisaki-kouji { white-space: normal; }
+.torihikisaki .torihikisaki-group { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.torihikisaki .torihikisaki-group-label { font-size: var(--fs-s); color: var(--ink-2); }
+/* 合計の値は見出しが2行になっても同じ行の値と下でそろえる */
+.torihikisaki .sum { display: flex; flex-direction: column; justify-content: space-between; }
+/* 幅1280で検索、支払、区分、並べ替えが1行に収まるよう、検索欄の基準の幅を詰める */
+.torihikisaki .filters > .grow { flex-basis: 160px; }
+.torihikisaki .torihikisaki-toggle { display: none; }
+.torihikisaki .torihikisaki-used { margin-left: 6px; font-weight: 600; color: var(--c-700); }
+/* 基本情報の項目と合計は同じ列に並べ、どちらも列の左から書く */
+.torihikisaki .info.torihikisaki-cols { column-gap: 0; }
+.torihikisaki .info.torihikisaki-cols > div { padding: 0 16px; }
+.torihikisaki .sums.torihikisaki-cols > .sum { text-align: left; }
+@media (min-width: 641px) {
+  .torihikisaki .torihikisaki-c4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .torihikisaki .torihikisaki-c5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .torihikisaki .info.torihikisaki-c4 > div:nth-child(4n+1),
+  .torihikisaki .info.torihikisaki-c5 > div:nth-child(5n+1),
+  .torihikisaki .sums.torihikisaki-cols > .sum:first-child { padding-left: 0; }
+  /* 一覧の状態の列は札の幅だけにする */
+  .torihikisaki .tbl td.torihikisaki-state { width: 1%; white-space: nowrap; }
+  /* チップの高さを検索欄にそろえ、見出しの高さを合わせる */
+  .torihikisaki .filters .chip { min-height: var(--ctl); }
+  /* 一覧と詳細の表で、右寄せの額のすぐ後の列は間を空け、額と次の値が1つの値に見えないようにする */
+  .torihikisaki .tbl-block .tbl th.num + th:not(.num),
+  .torihikisaki .tbl-block .tbl td.num + td:not(.num) { padding-left: var(--gut); }
+  /* 支払の列の無い一覧は、名称の列に余りを寄せ、ほかの列は中身の幅にする */
+  .torihikisaki > .torihikisaki-brief .tbl th:not(:nth-child(2)),
+  .torihikisaki > .torihikisaki-brief .tbl td:not(:nth-child(2)) { width: 1%; white-space: nowrap; }
+}
+/* 1279 以下は一覧の列の間を詰め、2つの見出しを2行にして、名称と支払条件の幅を取る */
+@media screen and (min-width: 641px) and (max-width: 1279px) {
+  .torihikisaki > .tbl-block .tbl th, .torihikisaki > .tbl-block .tbl td { padding-left: 6px; padding-right: 6px; }
+  .torihikisaki > .tbl-block .tbl th:first-child, .torihikisaki > .tbl-block .tbl td:first-child { padding-left: 16px; }
+  .torihikisaki > .tbl-block .tbl th:last-child, .torihikisaki > .tbl-block .tbl td:last-child { padding-right: 16px; }
+  .torihikisaki .torihikisaki-th-line { display: block; }
+}
+/* 合計が5つで1列が 144px に満たない幅は、項目と合計を3列にし、合計の見出しを語の区切りで2行までに収める */
+@media screen and (min-width: 641px) {
+  .torihikisaki .panel-body:has(> .sums.torihikisaki-c5) { container: torihikisaki-sums / inline-size; }
+}
+@container torihikisaki-sums (max-width: 719px) {
+  .torihikisaki .torihikisaki-c5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .torihikisaki .info.torihikisaki-c5 > div:nth-child(5n+1) { padding-left: 16px; }
+  .torihikisaki .info.torihikisaki-c5 > div:nth-child(3n+1),
+  .torihikisaki .sums.torihikisaki-c5 > .sum:nth-child(3n+1) { padding-left: 0; }
+  .torihikisaki .sums.torihikisaki-c5 > .sum:nth-child(3n) { border-right: 0; }
+  .torihikisaki .sums.torihikisaki-c5 > .sum:nth-child(-n+3) { border-bottom: 1px solid var(--line); }
+}
+/* 641〜1100 は表の入れ物の幅で詰め方を決め、横に送らずに収める。列の間を詰めて見出しを折り返し、入らない列はカードでも出さない列から外す。
+   どの段も、1つ前の段の表の最小の幅より広い幅から効き、表を入れ物から横にはみ出させない */
+@media screen and (min-width: 641px) and (max-width: 1100px) {
+  .torihikisaki .tbl-block { container: torihikisaki-tbl / inline-size; }
+  /* 発注の件名は10字の幅より狭くしない */
+  .torihikisaki .tbl td.torihikisaki-c-title { min-width: 10em; }
+}
+@container torihikisaki-tbl (max-width: 791px) {
+  .torihikisaki .tbl th { white-space: normal; word-break: keep-all; }
+  /* 発注の履歴の発注済の見出しは1行にする */
+  .torihikisaki .tbl th.torihikisaki-c-committed { white-space: nowrap; }
+  .torihikisaki .tbl th, .torihikisaki .tbl td { padding-left: 6px; padding-right: 6px; }
+  .torihikisaki .tbl th:first-child, .torihikisaki .tbl td:first-child { padding-left: 16px; }
+  .torihikisaki .tbl th:last-child, .torihikisaki .tbl td:last-child { padding-right: 16px; }
+  .torihikisaki .tbl-block .tbl th.num + th:not(.num),
+  .torihikisaki .tbl-block .tbl td.num + td:not(.num) { padding-left: 16px; }
+}
+@container torihikisaki-tbl (max-width: 733px) {
+  .torihikisaki .tbl .torihikisaki-c-amount { display: none; }
+}
+@container torihikisaki-tbl (max-width: 690px) {
+  .torihikisaki .tbl .torihikisaki-c-terms { display: none; }
+  .torihikisaki .tbl tr > :is(th, td):has(+ .torihikisaki-c-terms) { padding-right: 16px; }
+}
+@container torihikisaki-tbl (max-width: 673px) {
+  .torihikisaki .tbl .torihikisaki-c-invdate { display: none; }
+}
+@container torihikisaki-tbl (max-width: 659px) {
+  .torihikisaki .tbl .torihikisaki-c-cat { display: none; }
+}
+@media (max-width: 640px) {
+  /* 検索と「絞り込み」だけを出し、支払、区分、並べ替えはボタンで開く。開いたときは見出しを左に置いて帯を低くする */
+  .torihikisaki .filters { flex-direction: row; align-items: flex-end; }
+  .torihikisaki .filters > .grow { flex: 1 1 0; min-width: 0; }
+  .torihikisaki .torihikisaki-toggle { display: inline-flex; flex: 0 0 auto; }
+  .torihikisaki .filters > .torihikisaki-more { display: none; }
+  .torihikisaki .filters.is-open > .torihikisaki-group { display: flex; flex: 1 1 100%; flex-direction: row; align-items: flex-start; gap: 8px; }
+  .torihikisaki .torihikisaki-group-label { flex: none; width: 4em; min-height: var(--tap); display: flex; align-items: center; white-space: nowrap; }
+  /* 幅360でも区分の4つの札が1行に入るよう札の左右と間を詰め、どの段も札を行の幅いっぱいに等しく分けて左右の端をそろえる */
+  .torihikisaki .torihikisaki-group .chips { flex: 1 1 0; min-width: 0; gap: 6px 4px; }
+  .torihikisaki .torihikisaki-group .chip { flex: 1 1 0; padding: 0 4px; }
+  .torihikisaki .torihikisaki-group .chip .count { margin-left: 4px; }
+  /* 並べ替えは幅によらず2列にし、数が奇数のときは最後の1つを行の幅いっぱいに置く */
+  .torihikisaki .torihikisaki-group .chips.torihikisaki-sort { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .torihikisaki .torihikisaki-sort > .chip:last-child:nth-child(odd) { grid-column: 1 / -1; }
+  /* 合計が奇数のとき、最後の1つは行の幅いっぱいに置く */
+  .torihikisaki .sums .sum:last-child:nth-child(odd) { grid-column: 1 / -1; border-right: 0; }
+  .torihikisaki .info.torihikisaki-cols > div:nth-child(odd),
+  .torihikisaki .sums.torihikisaki-cols > .sum:nth-child(odd) { padding-left: 0; }
+}
+@media print {
+  /* 2つの見出しは語で2行にし、行の中では折り返さない */
+  .torihikisaki .torihikisaki-th-line { display: block; white-space: nowrap; }
+  .torihikisaki .torihikisaki-th-line wbr { display: none; }
+  /* 右寄せの額のすぐ後の列は間を空ける */
+  .torihikisaki .tbl-block .tbl th.num + th:not(.num),
+  .torihikisaki .tbl-block .tbl td.num + td:not(.num) { padding-left: 12pt; }
+  /* 合計の欄の左右を詰め、見出しを語の区切りで2行までに収める。項目も同じ列の左にそろえる */
+  .torihikisaki .info.torihikisaki-cols > div { padding: 0 10px; }
+  .torihikisaki .sums.torihikisaki-cols > .sum { padding-left: 10px; padding-right: 10px; }
+  /* 一覧の名称と支払条件は1行に置く */
+  .torihikisaki > .tbl-block .tbl td.torihikisaki-c-name,
+  .torihikisaki > .tbl-block .tbl td.torihikisaki-c-terms { white-space: nowrap; overflow-wrap: normal; }
+  .torihikisaki > .tbl-block .tbl td.torihikisaki-c-name wbr,
+  .torihikisaki > .tbl-block .tbl td.torihikisaki-c-terms wbr { display: none; }
+  /* 札の行も札の無い行と同じ高さにする */
+  .torihikisaki > .tbl-block .tbl td.torihikisaki-state { padding-top: 0; padding-bottom: 0; }
+}
+/* 画面: 取引先の一覧 ここまで */
