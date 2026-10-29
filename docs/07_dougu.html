@@ -62,10 +62,9 @@ HEADER = '// 架空の会社の資料です（自主制作）'</code></pre>
 <tr><td data-label="項目">締めの期間</td><td data-label="関数"><code>check_closing</code></td><td data-label="見る事">締め済だった間に、その月の日付の記録が作られていない。締めは月の順で末日より後。解除は直近の月だけ。締めた時点で受付のままの請求と未計上の労務費が無い</td></tr>
 <tr><td data-label="項目">履歴の対応</td><td data-label="関数"><code>check_history</code></td><td data-label="見る事">日時の順、操作者と役割が社員の表と合うこと。登録、承認、取消、訂正、締めなどの操作に履歴があり、理由が要る操作に理由がある。対象と関連の番号が実在する</td></tr>
 <tr><td data-label="項目">場面</td><td data-label="関数"><code>check_scenes</code></td><td data-label="見る事">例外の場面と操作の流れの番号が実在し、場面の条件（予算超過、締め済の月の日付、二重の疑い、発注検収なし）を満たす</td></tr>
-<tr><td data-label="項目">公開禁止語</td><td data-label="関数"><code>check_words</code></td><td data-label="見る事">--words で渡した語の一覧が、公開するファイルに無い。語そのものは出さない</td></tr>
 </tbody>
 </table>
-<p>公開禁止語のほかの5項目は、次の関数でまとめて走る。make_data.py もこの関数を呼んでから data.js を書き出す。</p>
+<p>この5項目は、次の関数でまとめて走る。make_data.py もこの関数を呼んでから data.js を書き出す。</p>
 <pre><code>def run_checks(S):
     """項目ごとに (項目名, 該当の一覧) を返す。一覧が空なら合格。"""
     M = Model(S)

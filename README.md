@@ -15,7 +15,7 @@
 - スプレッドシート版の例（Google Apps Script）
 - 文書に載せた図（SVG 4枚）
 
-設計から実装、検証まで AI（Claude Code）を使って進め、サンプルデータの生成と整合の検査は Python の道具で行いました。
+使った物: HTML、CSS、JavaScript、Python、Google Apps Script、Claude Code
 
 実在する企業の業務、データ、資料は使っていません。
 
@@ -82,12 +82,6 @@ python tools/check_rules.py
 
 ```
 python tools/check_rules.py --table
-```
-
-公開してはいけない語の一覧のファイルを --words で渡すと、site の全ファイルにその語が無いかも調べます。語そのものは出しません。
-
-```
-python tools/check_rules.py --words 一覧のファイル
 ```
 
 assets/data.js から、原価表 docs/02_genka_sample.xlsx を作り直します。
